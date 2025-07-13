@@ -1,68 +1,31 @@
 #include <Arduino.h>
-#include <ESP8266WiFi.h>
 #include <ArduinoOTA.h>
-#include <DNSServer.h>
 #include <LittleFS.h>
 #include "constants.h"
 #include "web-server.h"
-#include "ap-server.h"
-
-DNSServer dnsServer;
+#include "wifi-tools.h"
 
 void setupOTA();
-void startWiFiAP();
-bool startSTA(const char* ssid, const char* password);
 
 void setup() {
     Serial.begin(115200);
-    Serial.flush();
+    Serial.println("");
     Serial.println("Booting Sketch...");
     LittleFS.begin();
+
+    WiFi.mode(WIFI_AP_STA);
     startWiFiAP();
 
-    setupApServer();
-    ap_server.begin();
+    setupWebServer();
+    webServer.begin();
 }
 
 void loop() {
     dnsServer.processNextRequest();
-    ap_server.handleClient();
-    delay(500);
+    webServer.handleClient();
+    delay(200);
 }
 
-void startWiFiAP() {
-    WiFi.mode(WIFI_AP);
-    WiFi.softAPConfig(AP_IP, AP_IP, IPAddress(255, 255, 255, 0));
-    bool result = WiFi.softAP(AP_SSID, AP_PASSWORD);
-    if (result) {
-        Serial.print("AP started with IP: ");
-        Serial.println(WiFi.softAPIP());
-        dnsServer.start(DNS_PORT, "*", AP_IP);
-    } else {
-        Serial.println("Failed to start AP");
-    }
-}
-
-bool startSTA(const char* ssid, const char* password) {
-    WiFi.mode(WIFI_STA);
-    WiFi.begin(ssid, password);
-
-    Serial.print("Connecting to WiFi");
-    for(int tries = 0; WiFi.status() != WL_CONNECTED && tries < WIFI_CONNECT_TRIES; tries++){
-        delay(WIFI_CONNECT_DELAY);
-        Serial.print(".");
-    }
-
-    if (WiFi.status() == WL_CONNECTED) {
-        Serial.println("\nWiFi connected!");
-        Serial.print("IP address: ");
-        Serial.println(WiFi.localIP());
-        return true;
-    } 
-    Serial.println("\nFailed to connect to WiFi");
-    return false;
-    
-}
 
 void setupOTA() {
     ArduinoOTA.onEnd([]() {

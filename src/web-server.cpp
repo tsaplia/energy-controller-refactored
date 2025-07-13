@@ -1,38 +1,11 @@
 #include <LittleFS.h>
+#include <ESP8266WiFi.h>
+#include <ArduinoJson.h>
 #include "web-server.h"
 #include "constants.h"
+#include <wifi-tools.h>
 
-ESP8266WebServer web_server(WEB_PORT);
-
-void handleNotFoundWeb();
-bool handleFileRead(String path);
-String getContentType(String filename);
-
-void setupWebServer() {
-    web_server.onNotFound(handleNotFoundWeb);
-}
-
-void handleNotFoundWeb() {
-    if(!handleFileRead(web_server.uri())) {
-        web_server.send(404, "text/plain", "{\"error\": \"Not Found\"}");
-    }
-}
-
-/* send the right file to the client returns true if file exists false otherwise */
-bool handleFileRead(String path){ 
-    if(path.endsWith("/")) path += "index.html"; 
-    if(path.indexOf(".") == -1) path += ".html"; 
-
-    String contentType = getContentType(path);
-    if(LittleFS.exists(path)){
-        File file = LittleFS.open(path, "r");
-        web_server.streamFile(file, contentType);
-        file.close();
-
-        return true;
-    }
-    return false;
-}
+ESP8266WebServer webServer(WEB_PORT);
 
 String getContentType(String filename){
     if (filename.endsWith(".html")) return "text/html";
@@ -45,3 +18,103 @@ String getContentType(String filename){
     else if (filename.endsWith(".ico")) return "image/x-icon";
     return "text/plain";
 }
+
+bool parseWifiCredentials(const String& body, const char*& ssid, const char*& password) {
+    JsonDocument doc;
+    DeserializationError error = deserializeJson(doc, body);
+    if (error) return false;
+
+    ssid = doc["ssid"];
+    password = doc["password"];
+    return (ssid != nullptr && password != nullptr);
+}
+
+/* check if the request is from the AP */
+bool isApRequest() {
+    return WiFi.softAPIP() == webServer.client().localIP();
+}
+
+/* check if the request is from the STA */
+bool isStaRequest() {
+    return WiFi.localIP() == webServer.client().localIP();
+}
+
+/* redirect to the root page (for the AP) */
+void sendRootRedirect() {
+    Serial.println("Redirecting to /");
+    webServer.sendHeader("Location", "/", true);
+    webServer.send(302, "text/plain", "");
+}
+
+/* send an error to the client */
+void sendError(int code, const char* message) {
+    Serial.println("Sending error " + String(code) + ": " + message);
+    webServer.send(code, "application/json", "{\"error\": \"" + String(message) + "\"}");
+}
+
+/* send the right file to the client */
+void sendFile(String path){ 
+    if(path.indexOf(".") == -1) path += ".html";
+    Serial.println("Got file request for " + path);
+
+    String contentType = getContentType(path);
+    if(LittleFS.exists(path)){
+        Serial.println("Sending file " + path);
+        File file = LittleFS.open(path, "r");
+        webServer.streamFile(file, contentType);
+        file.close();
+    } else {
+        sendError(404, "Not Found");
+    }
+}
+
+/* handle connect request for the AP */
+void handleWifiConnect() {
+    if(!isApRequest()) return sendError(403, "Forbidden");
+    Serial.println("Got wifi connect request");
+
+    if (webServer.hasArg("plain") == false) {
+        return sendError(400, "Body missing");
+    }
+
+    String body = webServer.arg("plain");
+    const char* ssid;
+    const char* password;
+    if (!parseWifiCredentials(body, ssid, password)) {
+        return sendError(400, "Invalid or missing JSON fields");
+    }
+
+    if (startWiFiSTA(ssid, password)) {
+        String ipJson = "{\"ip\":\"" + WiFi.localIP().toString() + "\"}";
+        webServer.send(200, "application/json", ipJson);
+        delay(1000);
+        disconnectAP();
+    } else {
+        sendError(500, "Failed to connect");
+    }
+}
+
+/* root handler for the AP & STA */
+void handleRoot() {
+    if(isApRequest()) {
+        sendFile("/auth.html");
+    } else {
+        sendFile("/index.html");
+    }
+}
+
+/* handle not found requests for the AP & STA */
+void handleNotFound() {
+    if(isApRequest()) {
+        sendRootRedirect();
+    } else {
+        sendFile(webServer.uri());
+    }
+}
+
+void setupWebServer() {
+    webServer.on("/", handleRoot);
+    webServer.on("/api/connect-wifi", HTTP_POST, handleWifiConnect);
+    webServer.onNotFound(handleNotFound);
+}
+
