@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>ESP8266 | Connect to Wifi</title>
+        <link rel="stylesheet" href="bootstrap.min.css" />
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <main class="container d-flex justify-content-center align-items-center">
+            <div class="auth-box shadow rounded">
+                <div class="auth-instructions">In order to start using the interface you need to connect to Wifi</div>
+                <form>
+                    <div class="mb-3">
+                        <label for="wifiName" class="col-form-label ml-2">Name</label>
+                        <input type="text" class="form-control" id="wifiName" placeholder="Wifi name . . . " />
+                    </div>
+                    <div class="mb-3">
+                        <label for="wifiPass" class="col-form-label ml-2">Password</label>
+                        <input type="text" class="form-control" id="wifiPass" placeholder="Wifi Password . . . " />
+                    </div>
+                    <div class="mb-3 form-row mt-4">
+                        <div class="col-12 col-sm-4">
+                            <button class="btn btn-primary btn-block">Connect</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </body>
+</html>

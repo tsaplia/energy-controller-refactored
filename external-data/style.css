@@ -1,0 +1,142 @@
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--light);
+    color: var(--dark);
+}
+main {
+    margin-top: 1.25rem;
+    flex-grow: 1;
+}
+
+/* Header */
+header {
+    padding: 1rem 0 2.5rem 0;
+    background-color: var(--primary);
+    color: var(--white);
+}
+h1.logo {
+    font-size: 2rem;
+    font-weight: 400;
+    margin-bottom: 0;
+}
+header > .container-md {
+    display: flex;
+    align-items: end;
+    column-gap: 2rem;
+    flex-wrap: wrap;
+}
+header nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    column-gap: 2rem;
+}
+.nav-item {
+    font-size: 1.25rem;
+    font-weight: 300;
+    color: var(--light);
+}
+.nav-item:hover {
+    color: var(--white);
+}
+.nav-item.active {
+    font-weight: 400;
+    color: var(--white);
+}
+
+/* Main */
+section {
+    margin-bottom: 2rem;
+}
+.section-header {
+    font-size: 1.75rem;
+    padding: 0.75rem 0;
+    border-bottom: 2px solid var(--secondary);
+    font-weight: normal;
+    color: var(--dark);
+    margin-bottom: 1.75rem;
+}
+
+/* Cards/Data */
+.row {
+    row-gap: 24px;
+}
+.card {
+    background-color: var(--white);
+    border-radius: 0.5rem;
+}
+.card-header {
+    border-radius: calc(0.5rem - 1px) calc(0.5rem - 1px) 0 0 !important;
+    font-size: 1.25rem;
+    text-align: center;
+    border-bottom: none;
+    background-color: var(--secondary);
+    font-weight: 500;
+    color: var(--dark);
+}
+.card-body.value {
+    color: var(--gray-dark);
+    font-size: 4rem;
+    text-align: center;
+    border-radius: 0 0 calc(0.5rem - 1px) calc(0.5rem - 1px);
+    padding: 0.5 0.25rem 1.5rem 0.25rem;
+    overflow-x: auto;
+    text-wrap: nowrap;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.card-body.value::-webkit-scrollbar {
+    display: none;
+}
+.card:hover {
+    border-color: var(--secondary);
+}
+
+/* Logs */
+.logs {
+    max-height: 450px;
+    overflow-y: auto;
+}
+
+/* Auth */
+.auth-box {
+    margin: 0 auto;
+    width: 100%;
+    max-width: 780px;
+    padding: 2rem;
+    background-color: var(--white);
+}
+.auth-instructions {
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.adress-box {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: center;
+    column-gap: 1rem;
+    font-size: 1.5rem;
+}
+.adress-box a{
+    font-weight: 500;
+    color: var(--primary)
+}
+
+/*Selection*/
+*::selection {
+  background: var(--secondary);
+  color: #ffffff;
+}
+*::-moz-selection {
+  background: var(--secondary);
+  color: #ffffff;
+}
+*::-webkit-selection {
+  background: var(--secondary);
+  color: #ffffff;
+}
