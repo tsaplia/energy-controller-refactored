@@ -5,6 +5,8 @@
 #include "constants.h"
 #include "web-server.h"
 #include "wifi-tools.h"
+#include "configs.h"
+#include "globals.h"
 
 FTPServer ftpSrv(LittleFS);
 
@@ -32,19 +34,26 @@ void setup() {
 
     LittleFS.begin();
     Serial.println("LittleFS mounted");
+
     logFsInfo();
+    configs.load();
+
     
     WiFi.mode(WIFI_AP_STA);
-    startWiFiAP();
+    if(configs.ssid.length() > 0 && configs.password.length() > 0) {
+        startWiFiSTA(configs.ssid, configs.password);
+    }
     
     setupWebServer();
     webServer.begin();
     Serial.println("Web server started");
 
+    setupOTA();
+    ArduinoOTA.begin();
+    Serial.println("OTA started");
+
     ftpSrv.begin(FTP_USER, FTP_PASSWORD);
     Serial.println("FTP server started");
-
-    setupOTA();
 }
 
 void loop() {
@@ -52,5 +61,13 @@ void loop() {
     webServer.handleClient();
     ArduinoOTA.handle();
     ftpSrv.handleFTP();
+
+    if(WiFi.status() == WL_CONNECTED && APConnected) {
+        Serial.println("STA and AP are connected at the same time");
+        disconnectAP();
+    } else if (WiFi.status() != WL_CONNECTED && !APConnected) {
+        Serial.println("No connection to WiFi, starting AP");
+        startWiFiAP();
+    }
     delay(200);
 }

@@ -2,8 +2,9 @@
 #include <ESP8266WiFi.h>
 #include <ArduinoJson.h>
 #include "web-server.h"
+#include "wifi-tools.h"
 #include "constants.h"
-#include <wifi-tools.h>
+#include "globals.h"
 
 ESP8266WebServer webServer(WEB_PORT);
 
@@ -19,14 +20,14 @@ String getContentType(String filename){
     return "text/plain";
 }
 
-bool parseWifiCredentials(const String& body, const char*& ssid, const char*& password) {
+bool parseWifiCredentials(const String& body, String& ssid, String& password) {
     JsonDocument doc;
     DeserializationError error = deserializeJson(doc, body);
     if (error) return false;
 
-    ssid = doc["ssid"];
-    password = doc["password"];
-    return (ssid != nullptr && password != nullptr);
+    ssid = doc["ssid"] | "";
+    password = doc["password"] | "";
+    return (ssid.length() > 0 && password.length() > 0);
 }
 
 /* check if the request is from the AP */
@@ -78,17 +79,16 @@ void handleWifiConnect() {
     }
 
     String body = webServer.arg("plain");
-    const char* ssid;
-    const char* password;
+    String ssid;
+    String password;
     if (!parseWifiCredentials(body, ssid, password)) {
         return sendError(400, "Invalid or missing JSON fields");
     }
 
-    if (startWiFiSTA(ssid, password)) {
+    if (changeWiFiSTA(ssid, password)) {
         String ipJson = "{\"ip\":\"" + WiFi.localIP().toString() + "\"}";
         webServer.send(200, "application/json", ipJson);
-        delay(500);
-        disconnectAP();
+        delay(1000);
     } else {
         sendError(500, "Failed to connect");
     }

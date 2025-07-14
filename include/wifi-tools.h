@@ -5,8 +5,10 @@
 #include <DNSServer.h>
 
 extern DNSServer dnsServer;
+extern bool APConnected;
 
-bool startWiFiSTA(const char* ssid, const char* password);
+void startWiFiSTA(String& ssid, String& password);
+bool changeWiFiSTA(String& ssid, String& password);
 bool startWiFiAP();
 bool disconnectAP();
 void setupOTA();
