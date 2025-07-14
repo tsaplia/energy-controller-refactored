@@ -9,5 +9,6 @@ extern DNSServer dnsServer;
 bool startWiFiSTA(const char* ssid, const char* password);
 bool startWiFiAP();
 bool disconnectAP();
+void setupOTA();
 
 #endif

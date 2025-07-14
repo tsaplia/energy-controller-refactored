@@ -87,7 +87,7 @@ void handleWifiConnect() {
     if (startWiFiSTA(ssid, password)) {
         String ipJson = "{\"ip\":\"" + WiFi.localIP().toString() + "\"}";
         webServer.send(200, "application/json", ipJson);
-        delay(1000);
+        delay(500);
         disconnectAP();
     } else {
         sendError(500, "Failed to connect");
