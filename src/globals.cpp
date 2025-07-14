@@ -2,3 +2,4 @@
 #include "constants.h"
 
 Configs configs(CONFIGS_FILENAME);
+Logger logger;

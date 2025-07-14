@@ -1,7 +1,7 @@
+#include "web-server.h"
 #include <LittleFS.h>
 #include <ESP8266WiFi.h>
 #include <ArduinoJson.h>
-#include "web-server.h"
 #include "wifi-tools.h"
 #include "constants.h"
 #include "globals.h"
@@ -42,25 +42,25 @@ bool isStaRequest() {
 
 /* redirect to the root page (for the AP) */
 void sendRootRedirect() {
-    Serial.println("Redirecting to /");
+    logger.debug("Redirecting to /");
     webServer.sendHeader("Location", "/", true);
     webServer.send(302, "text/plain", "");
 }
 
 /* send an error to the client */
 void sendError(int code, const char* message) {
-    Serial.println("Sending error " + String(code) + ": " + message);
+    logger.warning("Sending error " + String(code) + ": " + message);
     webServer.send(code, "application/json", "{\"error\": \"" + String(message) + "\"}");
 }
 
 /* send the right file to the client */
 void sendFile(String path){ 
     if(path.indexOf(".") == -1) path += ".html";
-    Serial.println("Got file request for " + path);
+    logger.debug("Got file request for " + path);
 
     String contentType = getContentType(path);
     if(LittleFS.exists(path)){
-        Serial.println("Sending file " + path);
+        logger.debug("Sending file " + path);
         File file = LittleFS.open(path, "r");
         webServer.streamFile(file, contentType);
         file.close();
@@ -72,7 +72,7 @@ void sendFile(String path){
 /* handle connect request for the AP */
 void handleWifiConnect() {
     if(!isApRequest()) return sendError(403, "Forbidden");
-    Serial.println("Got wifi connect request");
+    logger.debug("Got wifi connect request");
 
     if (webServer.hasArg("plain") == false) {
         return sendError(400, "Body missing");
@@ -103,6 +103,17 @@ void handleRoot() {
     }
 }
 
+void handleLogs() {
+    webServer.send(200, "text/plain", logger.getLogs());
+}
+
+void handleRestart() {
+    webServer.send(200, "text/json", "{\"status\": \"Restarting...\"}");
+    delay(500);
+    logger.warning("Restarting...");
+    ESP.restart();
+}
+
 /* handle not found requests for the AP & STA */
 void handleNotFound() {
     if(isApRequest()) {
@@ -115,6 +126,7 @@ void handleNotFound() {
 void setupWebServer() {
     webServer.on("/", handleRoot);
     webServer.on("/api/connect-wifi", HTTP_POST, handleWifiConnect);
+    webServer.on("/api/restart", handleRestart);
+    webServer.on("/all-logs", handleLogs);
     webServer.onNotFound(handleNotFound);
 }
-

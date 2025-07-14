@@ -23,4 +23,6 @@ constexpr byte DNS_PORT = 53;
 
 constexpr const char* CONFIGS_FILENAME = "/configs.json";
 
+constexpr int MAX_LOG_ENTRIES = 100;
+
 #endif

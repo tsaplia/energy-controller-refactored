@@ -1,5 +1,5 @@
-#include <ArduinoOTA.h>
 #include "wifi-tools.h"
+#include <ArduinoOTA.h>
 #include "constants.h"
 #include "globals.h"
 
@@ -12,11 +12,10 @@ bool startWiFiAP() {
     bool result = WiFi.softAP(AP_SSID, AP_PASSWORD);
     APConnected = result;
     if (result) {
-        Serial.print("AP started with IP: ");
-        Serial.println(WiFi.softAPIP());
+        logger.info("AP started with IP: " + WiFi.softAPIP().toString());
         dnsServer.start(DNS_PORT, "*", AP_IP);
     } else {
-        Serial.println("Failed to start AP");
+        logger.error("Failed to start AP");
     }
     return result;
 }
@@ -26,14 +25,14 @@ bool changeWiFiSTA(String& ssid, String& password) {
     startWiFiSTA(ssid, password);
 
     if (WiFi.status() == WL_CONNECTED) {
-        Serial.println("WiFi credentials updated");
+        logger.info("WiFi credentials updated");
         configs.ssid = ssid;
         configs.password = password;
         configs.save();
         return true;
     }
-    Serial.println("Failed to connect to " + ssid);
-    Serial.println("Reverting to previous credentials");
+    logger.warning("Failed to connect to " + ssid);
+    logger.info("Reverting to previous credentials");
     WiFi.begin(configs.ssid, configs.password);
     return false;
 }
@@ -41,22 +40,22 @@ bool changeWiFiSTA(String& ssid, String& password) {
 /* Connect to a WiFi network */
 void startWiFiSTA(String& ssid, String& password) {
     WiFi.begin(ssid, password);
-    Serial.print("Connecting to " + ssid);
+    logger.info("Connecting to " + ssid);
     for(int tries = 0; WiFi.status() != WL_CONNECTED && tries < WIFI_CONNECT_TRIES; tries++){
         delay(WIFI_CONNECT_DELAY);
-        Serial.print(".");
+        logger.debug("Attempt " + String(tries + 1));
     }
     if (WiFi.status() == WL_CONNECTED) {
-        Serial.println(String("WiFi connected on Ip: ") + WiFi.localIP().toString());
+        logger.info("WiFi connected on IP: " + WiFi.localIP().toString());
     }
 }
 
 /* Disconnect from an Access Point */
 bool disconnectAP() {
-    Serial.println("Disconnecting Access Point");
+    logger.info("Disconnecting Access Point");
     dnsServer.stop();
     bool result = WiFi.softAPdisconnect(true);
-    if(!result) Serial.println("Failed to disconnect from Access Point");
+    if(!result) logger.warning("Failed to disconnect from Access Point");
     APConnected = false;
     return result;
 }
@@ -67,26 +66,21 @@ void setupOTA() {
     ArduinoOTA.setPort(OTA_PORT);
 
     ArduinoOTA.onEnd([]() {
-        Serial.println("OTA End");
+        logger.info("OTA End");
     });
     ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-        Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+        logger.debug("OTA Progress: " + String((progress / (total / 100))) + "%");
     });
     ArduinoOTA.onError([](ota_error_t error) {
-        Serial.printf("OTA Error[%u]: ", error);
-        if (error == OTA_AUTH_ERROR) {
-            Serial.println("Auth Failed");
-        } else if (error == OTA_BEGIN_ERROR) {
-            Serial.println("Begin Failed");
-        } else if (error == OTA_CONNECT_ERROR) {
-            Serial.println("Connect Failed");
-        } else if (error == OTA_RECEIVE_ERROR) {
-            Serial.println("Receive Failed");
-        } else if (error == OTA_END_ERROR) {
-            Serial.println("End Failed");
-        }
+        String msg = "OTA Error[" + String(error) + "]: ";
+        if (error == OTA_AUTH_ERROR) msg += "Auth Failed";
+        else if (error == OTA_BEGIN_ERROR) msg += "Begin Failed";
+        else if (error == OTA_CONNECT_ERROR) msg += "Connect Failed";
+        else if (error == OTA_RECEIVE_ERROR) msg += "Receive Failed";
+        else if (error == OTA_END_ERROR) msg += "End Failed";
+        logger.error(msg);
     });
-    ArduinoOTA.onStart([]() { 
-        Serial.println("OTA Start"); 
+    ArduinoOTA.onStart([]() {
+        logger.info("OTA Start");
     });
 }

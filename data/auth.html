@@ -90,12 +90,6 @@
             form > div {
                 margin-bottom: 1rem;
             }
-            #error {
-                padding-left: 0.35rem;
-                font-weight: 500;
-                color: #cf3535;
-                display: none;
-            }
         </style>
     </head>
     <body>
@@ -110,7 +104,6 @@
                     <label for="wifiPass">Password</label>
                     <input type="text" id="wifiPass" placeholder="Wifi Password . . . " />
                 </div>
-                <div id="error">Some error</div>
                 <div>
                     <button type="submit">Connect</button>
                 </div>
@@ -128,7 +121,6 @@
             const connectBox = document.getElementById("connect-box");
             const ssidInput = document.getElementById("wifiName");
             const passInput = document.getElementById("wifiPass");
-            const error = document.getElementById("error");
             const ip = document.getElementById("ip");
             const btn = document.querySelector("button");
 
@@ -137,14 +129,9 @@
                 passInput.blur();
                 const ssid = ssidInput.value;
                 const password = passInput.value;
-                if (!ssid || !password) {
-                    error.innerText = "All fields are required";
-                    error.style.display = "block";
-                    return;
-                }
+                if (!ssid || !password) return;
                 btn.disabled = true;
                 btn.innerText = "Connecting . . .";
-                error.style.display = "none";
                 try {
                     const res = await fetch("/api/connect-wifi", { 
                         method: "POST", 
@@ -155,8 +142,7 @@
                     });
                     const json = await res.json();
                     if (json.error) {
-                        error.innerText = json.error;
-                        error.style.display = "block";
+                        alert(json.error);
                     } else {
                         connectBox.style.display = "none";
                         successBox.style.display = "block";

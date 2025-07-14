@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <ArduinoOTA.h>
-#include <LIttleFS.h>
+#include <LittleFS.h>
 #include <FTPServer.h>
 #include "constants.h"
 #include "web-server.h"
@@ -14,46 +14,43 @@ void logFsInfo() {
     FSInfo fsInfo;
     LittleFS.info(fsInfo);
 
-    Serial.print("Total space: ");
-    Serial.print(fsInfo.totalBytes / 1024.0, 2);
-    Serial.println(" KB");
-
-    Serial.print("Used space: ");
-    Serial.print(fsInfo.usedBytes / 1024.0, 2);
-    Serial.println(" KB");
-
-    Serial.print("Free space: ");
-    Serial.print((fsInfo.totalBytes - fsInfo.usedBytes) / 1024.0, 2);
-    Serial.println(" KB");
+    logger.info("Total space: " + String(fsInfo.totalBytes / 1024.0, 2) + " KB");
+    logger.info("Used space: " + String(fsInfo.usedBytes / 1024.0, 2) + " KB");
+    logger.info("Free space: " + String((fsInfo.totalBytes - fsInfo.usedBytes) / 1024.0, 2) + " KB");
 }
 
 void setup() {
     Serial.begin(115200);
-    Serial.println("");
-    Serial.println("Booting Sketch...");
+    logger.info("Booting Sketch...");
 
-    LittleFS.begin();
-    Serial.println("LittleFS mounted");
+    if(LittleFS.begin()) {
+        logger.info("LittleFS mounted");
+    } else {
+        logger.error("Failed to mount LittleFS");
+    }
 
     logFsInfo();
-    configs.load();
 
-    
+    if(!configs.load()) {
+        logger.warning("No config loaded");
+    }
+
     WiFi.mode(WIFI_AP_STA);
-    if(configs.ssid.length() > 0 && configs.password.length() > 0) {
+
+    if(!configs.ssid.isEmpty() && !configs.password.isEmpty()) {
         startWiFiSTA(configs.ssid, configs.password);
     }
-    
+
     setupWebServer();
     webServer.begin();
-    Serial.println("Web server started");
+    logger.info("Web server started");
 
     setupOTA();
     ArduinoOTA.begin();
-    Serial.println("OTA started");
+    logger.info("OTA started");
 
     ftpSrv.begin(FTP_USER, FTP_PASSWORD);
-    Serial.println("FTP server started");
+    logger.info("FTP server started");
 }
 
 void loop() {
@@ -63,11 +60,12 @@ void loop() {
     ftpSrv.handleFTP();
 
     if(WiFi.status() == WL_CONNECTED && APConnected) {
-        Serial.println("STA and AP are connected at the same time");
+        logger.warning("STA and AP are connected at the same time. Disconnecting AP.");
         disconnectAP();
     } else if (WiFi.status() != WL_CONNECTED && !APConnected) {
-        Serial.println("No connection to WiFi, starting AP");
+        logger.warning("No connection to WiFi, starting AP");
         startWiFiAP();
     }
+
     delay(200);
 }
