@@ -7,17 +7,9 @@
 #include "wifi-tools.h"
 #include "configs.h"
 #include "globals.h"
+#include "utils.h"
 
 FTPServer ftpSrv(LittleFS);
-
-void logFsInfo() {
-    FSInfo fsInfo;
-    LittleFS.info(fsInfo);
-
-    logger.info("Total space: " + String(fsInfo.totalBytes / 1024.0, 2) + " KB");
-    logger.info("Used space: " + String(fsInfo.usedBytes / 1024.0, 2) + " KB");
-    logger.info("Free space: " + String((fsInfo.totalBytes - fsInfo.usedBytes) / 1024.0, 2) + " KB");
-}
 
 void setup() {
     Serial.begin(115200);
@@ -29,7 +21,7 @@ void setup() {
         logger.error("Failed to mount LittleFS");
     }
 
-    logFsInfo();
+    logSystemInfo();
 
     if(!configs.load()) {
         logger.warning("No config loaded");
@@ -56,6 +48,7 @@ void setup() {
 void loop() {
     dnsServer.processNextRequest();
     webServer.handleClient();
+    logSocket.loop();
     ArduinoOTA.handle();
     ftpSrv.handleFTP();
 
@@ -66,6 +59,4 @@ void loop() {
         logger.warning("No connection to WiFi, starting AP");
         startWiFiAP();
     }
-
-    delay(200);
 }

@@ -25,4 +25,8 @@ constexpr const char* CONFIGS_FILENAME = "/configs.json";
 
 constexpr int MAX_LOG_ENTRIES = 100;
 
+constexpr const char* WS_TYPE_HISTORY   = "history";
+constexpr const char* WS_TYPE_LOG       = "log";
+constexpr const char* WS_TYPE_DATA      = "data";
+
 #endif

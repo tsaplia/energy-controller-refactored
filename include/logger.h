@@ -26,23 +26,25 @@ private:
     int size = 0;
     LogEntry logs[MAX_LOG_ENTRIES];
 
+    std::function<void(const LogEntry&)> onNewLog = nullptr; 
+
 public:
     void add(const LogEntry& log);
     void setLogLevel(int level);
     String getLogs() const;
+    void onNew(std::function<void(const LogEntry&)> callback);
 };
 
 class Logger {
 private:
-    LogStorage logStorage;
     void log(int level, const String& msg);
 
 public:
+    LogStorage logStorage;
     void debug(const String& msg);
     void info(const String& msg);
     void warning(const String& msg);
     void error(const String& msg);
-    String getLogs() const;
     void setLogLevel(int level);
 };
 

@@ -5,20 +5,10 @@
 #include "wifi-tools.h"
 #include "constants.h"
 #include "globals.h"
+#include <utils.h>
 
 ESP8266WebServer webServer(WEB_PORT);
-
-String getContentType(String filename){
-    if (filename.endsWith(".html")) return "text/html";
-    else if (filename.endsWith(".css")) return "text/css";
-    else if (filename.endsWith(".csv")) return "text/csv";
-    else if (filename.endsWith(".js")) return "application/javascript";
-    else if (filename.endsWith(".png")) return "image/png";
-    else if (filename.endsWith(".jpg")) return "image/jpeg";
-    else if (filename.endsWith(".gif")) return "image/gif";
-    else if (filename.endsWith(".ico")) return "image/x-icon";
-    return "text/plain";
-}
+WebSockets4WebServer logSocket;
 
 bool parseWifiCredentials(const String& body, String& ssid, String& password) {
     JsonDocument doc;
@@ -28,6 +18,22 @@ bool parseWifiCredentials(const String& body, String& ssid, String& password) {
     ssid = doc["ssid"] | "";
     password = doc["password"] | "";
     return (ssid.length() > 0 && password.length() > 0);
+}
+
+String getSocketPayload(const String& type, const String& msg) {
+    return "{\"type\": \"" + type + "\", \"log\": \"" + msg + "\"}";
+}
+
+/* event handler for the socket on /log */
+void logSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length) {
+    IPAddress ip = logSocket.remoteIP(num);
+    if(type == WStype_CONNECTED) {
+        String text = getSocketPayload(WS_TYPE_HISTORY, logger.logStorage.getLogs());
+        logSocket.sendTXT(num, text);
+        logger.debug("Connected to log socket: " + ip.toString());
+    } else if (type == WStype_DISCONNECTED) {
+        logger.debug("Disconnected from log socket: " + ip.toString());
+    }
 }
 
 /* check if the request is from the AP */
@@ -94,7 +100,31 @@ void handleWifiConnect() {
     }
 }
 
-/* root handler for the AP & STA */
+/* get current sinfo about heaf and filesystem (AP & STA) */
+void handleSystemInfo() {
+    JsonDocument doc;
+    doc["heap_free"] = ESP.getFreeHeap();
+    doc["heap_max_block"] = ESP.getMaxFreeBlockSize();
+    doc["heap_fragmentation"] = ESP.getHeapFragmentation();
+    FSInfo fsInfo;
+    LittleFS.info(fsInfo);
+    doc["fs_total_kb"] = fsInfo.totalBytes / 1024.0;
+    doc["fs_used_kb"] = fsInfo.usedBytes / 1024.0;
+    String json;
+    serializeJson(doc, json);
+    webServer.send(200, "application/json", json);
+}
+
+
+/* restart controller (AP & STA)*/
+void handleRestart() {
+    webServer.send(200, "text/json", "{\"status\": \"Restarting...\"}");
+    delay(500);
+    logger.warning("Restarting...");
+    ESP.restart();
+}
+
+/* root handler for AP & STA */
 void handleRoot() {
     if(isApRequest()) {
         sendFile("/auth.html");
@@ -103,16 +133,6 @@ void handleRoot() {
     }
 }
 
-void handleLogs() {
-    webServer.send(200, "text/plain", logger.getLogs());
-}
-
-void handleRestart() {
-    webServer.send(200, "text/json", "{\"status\": \"Restarting...\"}");
-    delay(500);
-    logger.warning("Restarting...");
-    ESP.restart();
-}
 
 /* handle not found requests for the AP & STA */
 void handleNotFound() {
@@ -127,6 +147,13 @@ void setupWebServer() {
     webServer.on("/", handleRoot);
     webServer.on("/api/connect-wifi", HTTP_POST, handleWifiConnect);
     webServer.on("/api/restart", handleRestart);
-    webServer.on("/all-logs", handleLogs);
+    webServer.on("/api/system-info", handleSystemInfo);
     webServer.onNotFound(handleNotFound);
+
+    webServer.addHook(logSocket.hookForWebserver("/ws/logs", logSocketEvent));
+
+    logger.logStorage.onNew([](const LogEntry& log) {
+        String text = getSocketPayload(WS_TYPE_LOG, log);
+        logSocket.broadcastTXT(text);
+    });
 }

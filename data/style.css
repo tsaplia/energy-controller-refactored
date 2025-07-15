@@ -91,9 +91,6 @@ section {
 .card-body.value::-webkit-scrollbar {
     display: none;
 }
-.card:hover {
-    border-color: var(--primary);
-}
 
 /* Logs */
 .logs {
