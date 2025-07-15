@@ -5,6 +5,9 @@
 #include <ESP8266WiFi.h>
 
 constexpr int WEB_PORT = 80;
+constexpr const char* WS_TYPE_HISTORY   = "history";
+constexpr const char* WS_TYPE_LOG       = "log";
+constexpr const char* WS_TYPE_DATA      = "data";
 
 constexpr const char* AP_PASSWORD = "password";
 constexpr const char* AP_SSID = "ESP8266-Sensor";
@@ -24,9 +27,11 @@ constexpr byte DNS_PORT = 53;
 constexpr const char* CONFIGS_FILENAME = "/configs.json";
 
 constexpr int MAX_LOG_ENTRIES = 100;
+constexpr int LOG_SAVE_INTERVAL = 1000*60*5;    // 5 minutes
 
-constexpr const char* WS_TYPE_HISTORY   = "history";
-constexpr const char* WS_TYPE_LOG       = "log";
-constexpr const char* WS_TYPE_DATA      = "data";
+constexpr const char* TIME_SERVER_1 = "pool.ntp.org";
+constexpr const char* TIME_SERVER_2 = "time.nist.gov";
+constexpr const int TIMEZONE_OFFSET_SEC = 60*60*2;  // 2 hours
+constexpr int TIME_SYNC_INTERVAL = 1000*60*60*6;    // 6 hours
 
 #endif

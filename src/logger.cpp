@@ -2,8 +2,16 @@
 
 const String LOG_LEVEL_NAMES[] = {"DEBUG", "INFO", "WARNING", "ERROR"};
 
+/* Format time as "YYYY-MM-DD HH:MM:SS" for logging */
+String formatTime(time_t t) {
+    char buf[20];
+    struct tm* tm_info = localtime(&t);
+    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", tm_info);
+    return String(buf);
+}
+
 LogEntry::operator String() const {
-    return String(this->timestamp) + " [" + LOG_LEVEL_NAMES[this->level] + "] " + this->msg;
+    return formatTime(this->timestamp) + " [" + LOG_LEVEL_NAMES[this->level] + "] " + this->msg;
 }
 
 void LogStorage::add(const LogEntry& log) {
@@ -36,7 +44,7 @@ void LogStorage::onNew(std::function<void(const LogEntry &)> callback) {
 }
 
 void Logger::log(int level, const String& msg) {
-    LogEntry log = {level, msg, millis()};
+    LogEntry log = {level, msg, time(nullptr)};
     Serial.println(log);
     logStorage.add(log);
 }

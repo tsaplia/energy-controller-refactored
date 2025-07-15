@@ -5,5 +5,6 @@
 
 String getContentType(const String& filename);
 void logSystemInfo();
+bool syncTime();
 
 #endif

@@ -5,22 +5,22 @@
 #include "globals.h"
 
 void logSystemInfo() {
-    logger.info("== Chip Info ==");
-    logger.info("Chip ID: " + String(ESP.getChipId()));
-    logger.info("Core version: " + String(ESP.getCoreVersion()));
-    logger.info("SDK version: " + String(ESP.getSdkVersion()));
-    logger.info("CPU Frequency: " + String(ESP.getCpuFreqMHz()) + " MHz");
+    logger.debug("== Chip Info ==");
+    logger.debug("Chip ID: " + String(ESP.getChipId()));
+    logger.debug("Core version: " + String(ESP.getCoreVersion()));
+    logger.debug("SDK version: " + String(ESP.getSdkVersion()));
+    logger.debug("CPU Frequency: " + String(ESP.getCpuFreqMHz()) + " MHz");
 
-    logger.info("== Flash Info ==");
-    logger.info("Flash chip size: " + String(ESP.getFlashChipSize() / 1024) + " KB");
-    logger.info("Flash chip speed: " + String(ESP.getFlashChipSpeed() / 1000000) + " MHz");
-    logger.info("Sketch size: " + String(ESP.getSketchSize() / 1024) + " KB");
-    logger.info("Free sketch space: " + String(ESP.getFreeSketchSpace() / 1024) + " KB");
+    logger.debug("== Flash Info ==");
+    logger.debug("Flash chip size: " + String(ESP.getFlashChipSize() / 1024) + " KB");
+    logger.debug("Flash chip speed: " + String(ESP.getFlashChipSpeed() / 1000000) + " MHz");
+    logger.debug("Sketch size: " + String(ESP.getSketchSize() / 1024) + " KB");
+    logger.debug("Free sketch space: " + String(ESP.getFreeSketchSpace() / 1024) + " KB");
 
-    logger.info("== RAM Info ==");
-    logger.info("Free heap: " + String(ESP.getFreeHeap() / 1024.0, 2) + " KB");
-    logger.info("Max free block size: " + String(ESP.getMaxFreeBlockSize() / 1024.0, 2) + " KB");
-    logger.info("Heap fragmentation: " + String(ESP.getHeapFragmentation()) + " %");
+    logger.debug("== RAM Info ==");
+    logger.debug("Free heap: " + String(ESP.getFreeHeap() / 1024.0, 2) + " KB");
+    logger.debug("Max free block size: " + String(ESP.getMaxFreeBlockSize() / 1024.0, 2) + " KB");
+    logger.debug("Heap fragmentation: " + String(ESP.getHeapFragmentation()) + " %");
 
     logger.info("== Filesystem Info ==");
     FSInfo fsInfo;
@@ -41,4 +41,16 @@ String getContentType(const String& filename) {
     else if (filename.endsWith(".gif")) return "image/gif";
     else if (filename.endsWith(".ico")) return "image/x-icon";
     return "text/plain";
+}
+
+bool syncTime() {
+    if(WiFi.status() != WL_CONNECTED) return false;
+
+    configTime(TIMEZONE_OFFSET_SEC, 0, TIME_SERVER_1, TIME_SERVER_2);
+    lastTimerSync = millis();
+
+    while (time(nullptr) < 100000) delay(100);
+
+    logger.info("Time synchronized");
+    return true;
 }

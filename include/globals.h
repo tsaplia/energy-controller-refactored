@@ -7,4 +7,6 @@
 extern Configs configs;
 extern Logger logger;
 
+extern unsigned long lastTimerSync;
+
 #endif

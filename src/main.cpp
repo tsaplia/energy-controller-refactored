@@ -13,36 +13,37 @@ FTPServer ftpSrv(LittleFS);
 
 void setup() {
     Serial.begin(115200);
+    
     logger.info("Booting Sketch...");
+    logSystemInfo();
 
     if(LittleFS.begin()) {
-        logger.info("LittleFS mounted");
+        logger.debug("LittleFS mounted");
     } else {
         logger.error("Failed to mount LittleFS");
     }
-
-    logSystemInfo();
-
     if(!configs.load()) {
         logger.warning("No config loaded");
     }
 
     WiFi.mode(WIFI_AP_STA);
-
     if(!configs.ssid.isEmpty() && !configs.password.isEmpty()) {
         startWiFiSTA(configs.ssid, configs.password);
+    }
+    if(WiFi.status() == WL_CONNECTED) {
+        syncTime();
     }
 
     setupWebServer();
     webServer.begin();
-    logger.info("Web server started");
+    logger.debug("Web server started");
 
     setupOTA();
     ArduinoOTA.begin();
-    logger.info("OTA started");
+    logger.debug("OTA started");
 
     ftpSrv.begin(FTP_USER, FTP_PASSWORD);
-    logger.info("FTP server started");
+    logger.debug("FTP server started");
 }
 
 void loop() {
@@ -59,4 +60,6 @@ void loop() {
         logger.warning("No connection to WiFi, starting AP");
         startWiFiAP();
     }
+
+    if(lastTimerSync + TIME_SYNC_INTERVAL < millis()) syncTime();
 }
