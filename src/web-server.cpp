@@ -32,7 +32,7 @@ void logSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
         logSocket.sendTXT(num, text);
         logger.debug("Connected to log socket: " + ip.toString());
     } else if (type == WStype_DISCONNECTED) {
-        logger.debug("Disconnected from log socket: " + ip.toString());
+        logger.debug("Someone disconnected from log socket");
     }
 }
 
@@ -55,7 +55,7 @@ void sendRootRedirect() {
 
 /* send an error to the client */
 void sendError(int code, const char* message) {
-    logger.warning("Sending error " + String(code) + ": " + message);
+    logger.debug("Sending error " + String(code) + ": " + message);
     webServer.send(code, "application/json", "{\"error\": \"" + String(message) + "\"}");
 }
 

@@ -17,22 +17,27 @@ struct LogEntry {
     time_t timestamp;
 
     operator String() const;
+    String toFileFormat() const;
 };
 
 class LogStorage {
 private:
+    bool saved = true;
     int logLevel = LOG_LEVEL_INFO;
     int firstLogPos = 0;
     int size = 0;
     LogEntry logs[MAX_LOG_ENTRIES];
-
+    
     std::function<void(const LogEntry&)> onNewLog = nullptr; 
-
+    
 public:
     void add(const LogEntry& log);
     void setLogLevel(int level);
     String getLogs() const;
     void onNew(std::function<void(const LogEntry&)> callback);
+    bool load(const char* filename);
+    bool save(const char* filename);
+    bool isSaved() const;
 };
 
 class Logger {

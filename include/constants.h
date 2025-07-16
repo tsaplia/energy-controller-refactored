@@ -25,13 +25,15 @@ constexpr int WIFI_CONNECT_TRIES = 15;
 constexpr byte DNS_PORT = 53;
 
 constexpr const char* CONFIGS_FILENAME = "/configs.json";
+constexpr const char* LOG_FILENAME = "/logs.txt";
 
 constexpr int MAX_LOG_ENTRIES = 100;
-constexpr int LOG_SAVE_INTERVAL = 1000*60*5;    // 5 minutes
+constexpr int LOG_SAVE_INTERVAL = 1000*60*1;    // 1 minutes
+constexpr bool STREAM_ALL_LOGS = true;  // needs to be changed
 
 constexpr const char* TIME_SERVER_1 = "pool.ntp.org";
 constexpr const char* TIME_SERVER_2 = "time.nist.gov";
 constexpr const int TIMEZONE_OFFSET_SEC = 60*60*2;  // 2 hours
-constexpr int TIME_SYNC_INTERVAL = 1000*60*60*6;    // 6 hours
+constexpr const int TIME_SYNC_INTERVAL = 1000*60*60*5;    // 5 hours
 
 #endif

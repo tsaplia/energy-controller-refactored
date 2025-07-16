@@ -10,20 +10,21 @@
 #include "utils.h"
 
 FTPServer ftpSrv(LittleFS);
+unsigned long lastLogSave = 0;
+unsigned long lastTimerSync = 0;
 
 void setup() {
     Serial.begin(115200);
-    
-    logger.info("Booting Sketch...");
-    logSystemInfo();
 
+    logger.debug("Booting Sketch...");
+    
     if(LittleFS.begin()) {
         logger.debug("LittleFS mounted");
+        logSystemInfo(); // TODO: Move to web server
+        if(!configs.load()) logger.warning("No config loaded");
+        if(!logger.logStorage.load(LOG_FILENAME)) logger.warning("Failed to load logs");
     } else {
         logger.error("Failed to mount LittleFS");
-    }
-    if(!configs.load()) {
-        logger.warning("No config loaded");
     }
 
     WiFi.mode(WIFI_AP_STA);
@@ -32,6 +33,7 @@ void setup() {
     }
     if(WiFi.status() == WL_CONNECTED) {
         syncTime();
+        lastTimerSync = millis();
     }
 
     setupWebServer();
@@ -61,5 +63,18 @@ void loop() {
         startWiFiAP();
     }
 
-    if(lastTimerSync + TIME_SYNC_INTERVAL < millis()) syncTime();
+    if(lastTimerSync + TIME_SYNC_INTERVAL < millis() || lastTimerSync == 0) {
+        if(WiFi.status() == WL_CONNECTED) {
+            syncTime();
+            lastTimerSync = millis();
+        }
+    }
+    if(lastLogSave + LOG_SAVE_INTERVAL < millis() && !logger.logStorage.isSaved()) {
+        logger.info("Saving logs...");
+        if(logger.logStorage.save(LOG_FILENAME)){
+            lastLogSave = millis();
+        } else {
+            logger.warning("Failed to save logs");
+        }
+    }
 }

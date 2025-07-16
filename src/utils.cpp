@@ -22,13 +22,13 @@ void logSystemInfo() {
     logger.debug("Max free block size: " + String(ESP.getMaxFreeBlockSize() / 1024.0, 2) + " KB");
     logger.debug("Heap fragmentation: " + String(ESP.getHeapFragmentation()) + " %");
 
-    logger.info("== Filesystem Info ==");
+    logger.debug("== Filesystem Info ==");
     FSInfo fsInfo;
     LittleFS.info(fsInfo);
     float totalKB = fsInfo.totalBytes / 1024.0;
     float usedKB = fsInfo.usedBytes / 1024.0;
-    logger.info("Total space: " + String(totalKB, 2) + " KB");
-    logger.info("Used space: " + String(usedKB, 2) + " KB");
+    logger.debug("Total space: " + String(totalKB, 2) + " KB");
+    logger.debug("Used space: " + String(usedKB, 2) + " KB");
 }
 
 String getContentType(const String& filename) {
@@ -47,10 +47,8 @@ bool syncTime() {
     if(WiFi.status() != WL_CONNECTED) return false;
 
     configTime(TIMEZONE_OFFSET_SEC, 0, TIME_SERVER_1, TIME_SERVER_2);
-    lastTimerSync = millis();
-
     while (time(nullptr) < 100000) delay(100);
 
-    logger.info("Time synchronized");
+    logger.info("Time updated");
     return true;
 }

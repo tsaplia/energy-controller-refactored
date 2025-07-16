@@ -6,10 +6,6 @@
 Configs::Configs(const char* filename): filename(filename) {}
 
 bool Configs::load() {
-    if (!LittleFS.exists(filename)) {
-        logger.warning("Config file does not exist");
-        return false;
-    }
     File file = LittleFS.open(filename, "r");
     if (!file) {
         logger.error("Failed to open config file for reading");
