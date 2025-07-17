@@ -8,19 +8,22 @@
 #include "configs.h"
 #include "globals.h"
 #include "utils.h"
+#include <sensor.h>
 
 FTPServer ftpSrv(LittleFS);
 unsigned long lastLogSave = 0;
-unsigned long lastTimerSync = 0;
+unsigned long lastDataGot = 0; // (sec) should be multiple of DATA_SAVE_INTERVAL_SEC
 
 void setup() {
     Serial.begin(115200);
+
+    // Serial.begin(9600); 
+    // node.begin(0xF8, Serial);
 
     logger.debug("Booting Sketch...");
     
     if(LittleFS.begin()) {
         logger.debug("LittleFS mounted");
-        logSystemInfo(); // TODO: Move to web server
         if(!configs.load()) logger.warning("No config loaded");
         if(!logger.logStorage.load(LOG_FILENAME)) logger.warning("Failed to load logs");
     } else {
@@ -31,10 +34,7 @@ void setup() {
     if(!configs.ssid.isEmpty() && !configs.password.isEmpty()) {
         startWiFiSTA(configs.ssid, configs.password);
     }
-    if(WiFi.status() == WL_CONNECTED) {
-        syncTime();
-        lastTimerSync = millis();
-    }
+    syncTime();
 
     setupWebServer();
     webServer.begin();
@@ -46,15 +46,19 @@ void setup() {
 
     ftpSrv.begin(FTP_USER, FTP_PASSWORD);
     logger.debug("FTP server started");
+
+    logger.info("Sketch booted");
 }
 
 void loop() {
     dnsServer.processNextRequest();
     webServer.handleClient();
     logSocket.loop();
+    dataSocket.loop();
     ArduinoOTA.handle();
     ftpSrv.handleFTP();
 
+    
     if(WiFi.status() == WL_CONNECTED && APConnected) {
         logger.warning("STA and AP are connected at the same time. Disconnecting AP.");
         disconnectAP();
@@ -62,19 +66,34 @@ void loop() {
         logger.warning("No connection to WiFi, starting AP");
         startWiFiAP();
     }
+    
+    if(!timeSynced ||  lastTimerSync + TIME_SYNC_INTERVAL < millis()) syncTime();
 
-    if(lastTimerSync + TIME_SYNC_INTERVAL < millis() || lastTimerSync == 0) {
-        if(WiFi.status() == WL_CONNECTED) {
-            syncTime();
-            lastTimerSync = millis();
-        }
-    }
     if(lastLogSave + LOG_SAVE_INTERVAL < millis() && !logger.logStorage.isSaved()) {
         logger.info("Saving logs...");
         if(logger.logStorage.save(LOG_FILENAME)){
             lastLogSave = millis();
         } else {
             logger.warning("Failed to save logs");
+        }
+    }
+
+    /* Continue only if time is synced */
+    if(!timeSynced) return;
+
+    time_t now = time(nullptr);
+    if(lastDataGot + DATA_SAVE_INTERVAL_SEC <= now){
+        // TODO: save data but only if lastdagot != 0
+        logger.info("Getting sensor data...");
+        SensorData data = getSensorData();
+
+        lastDataGot = now - now % DATA_SAVE_INTERVAL_SEC; // set even if data is not valid
+
+        if(data.valid) {
+            String payload = getSocketPayload(WS_TYPE_DATA, data.toJson(), false);
+            dataSocket.broadcastTXT(payload);
+        } else {
+            logger.error("Failed to get data");
         }
     }
 }

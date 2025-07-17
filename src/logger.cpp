@@ -1,18 +1,11 @@
 #include "logger.h"
 #include <LittleFS.h>
+#include "utils.h"
 
 const String LOG_LEVEL_NAMES[] = {"DEBUG", "INFO", "WARNING", "ERROR"};
 
-/* Format time as "YYYY-MM-DD HH:MM:SS" for logging */
-String formatTime(time_t t) {
-    char buf[20];
-    struct tm* tm_info = localtime(&t);
-    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", tm_info);
-    return String(buf);
-}
-
 LogEntry::operator String() const {
-    return formatTime(this->timestamp) + " [" + LOG_LEVEL_NAMES[this->level] + "] " + this->msg;
+    return formatTime(this->timestamp, LOGGER_TIME_FORMAT) + " [" + LOG_LEVEL_NAMES[this->level] + "] " + this->msg;
 }
 
 String LogEntry::toFileFormat() const {

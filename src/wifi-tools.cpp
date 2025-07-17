@@ -78,7 +78,7 @@ void setupOTA() {
         else if (error == OTA_CONNECT_ERROR) msg += "Connect Failed";
         else if (error == OTA_RECEIVE_ERROR) msg += "Receive Failed";
         else if (error == OTA_END_ERROR) msg += "End Failed";
-        logger.error(msg);
+        logger.error("OTA Error: " + msg);
     });
     ArduinoOTA.onStart([]() {
         logger.info("OTA Start");

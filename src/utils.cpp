@@ -42,6 +42,13 @@ String getContentType(const String& filename) {
     else if (filename.endsWith(".ico")) return "image/x-icon";
     return "text/plain";
 }
+  
+String formatTime(time_t t, const char* format) {
+    char buf[25];
+    struct tm* tmInfo = localtime(&t);
+    strftime(buf, sizeof(buf), format, tmInfo);
+    return String(buf);
+}
 
 bool syncTime() {
     if(WiFi.status() != WL_CONNECTED) return false;
@@ -49,6 +56,8 @@ bool syncTime() {
     configTime(TIMEZONE_OFFSET_SEC, 0, TIME_SERVER_1, TIME_SERVER_2);
     while (time(nullptr) < 100000) delay(100);
 
+    lastTimerSync = millis();
+    timeSynced = true;
     logger.info("Time updated");
     return true;
 }
