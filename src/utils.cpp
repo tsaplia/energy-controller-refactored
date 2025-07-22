@@ -61,3 +61,19 @@ bool syncTime() {
     logger.info("Time updated");
     return true;
 }
+
+bool writeFile(const char* path, String message) {
+    File file = LittleFS.open(path, "a");
+    if (!file) {
+        logger.error("Failed to open file for writing: " + String(path));
+        return false;
+    }
+    file.print(message);
+    file.close();
+    return true;
+}
+
+bool writeEnergy(time_t timestamp, char phase, String formattedEnergy) {
+    String payload = formatTime(timestamp, STATS_DATE_FORMAT) + ";" + String(phase) + ";" + formattedEnergy + "\n";
+    return writeFile(STATS_FILENAME, payload);
+}

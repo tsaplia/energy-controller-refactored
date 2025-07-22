@@ -31,7 +31,7 @@ void LogStorage::setLogLevel(int level) {
 }
 
 String LogStorage::getLogs() const {
-    String output;
+    String output = "";
     int start = size < MAX_LOG_ENTRIES ? 0 : firstLogPos;
     for (int i = 0; i < size; i++) {
         output += String(logs[(start + i) % MAX_LOG_ENTRIES]) + ";";
@@ -46,6 +46,7 @@ void LogStorage::onNew(std::function<void(const LogEntry &)> callback) {
 LogEntry readLog(File file) {
     time_t timestamp = file.parseInt();
     int level = file.parseInt();
+    file.read(); // read space
     String msg = file.readStringUntil(';');
     if(msg.length() == 0 || timestamp < 0 || level < LOG_LEVEL_DEBUG || level > LOG_LEVEL_ERROR) {
         return {-1, "Invalid log", 0};

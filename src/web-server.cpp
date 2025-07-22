@@ -69,9 +69,9 @@ void sendRootRedirect() {
 }
 
 /* send an error to the client */
-void sendError(int code, const char* message) {
-    logger.debug("Sending error " + String(code) + ": " + message);
-    webServer.send(code, "application/json", "{\"error\": \"" + String(message) + "\"}");
+void sendMessage(int code, const char* message) {
+    logger.debug("Sending message " + String(code) + ": " + message);
+    webServer.send(code, "application/json", "{\"detail\": \"" + String(message) + "\"}");
 }
 
 /* send the right file to the client */
@@ -86,24 +86,24 @@ void sendFile(String path){
         webServer.streamFile(file, contentType);
         file.close();
     } else {
-        sendError(404, "Not Found");
+        sendMessage(404, "Not Found");
     }
 }
 
 /* handle connect request for the AP */
 void handleWifiConnect() {
-    if(!isApRequest()) return sendError(403, "Forbidden");
+    if(!isApRequest()) return sendMessage(403, "Forbidden");
     logger.debug("Got wifi connect request");
 
     if (webServer.hasArg("plain") == false) {
-        return sendError(400, "Body missing");
+        return sendMessage(400, "Body missing");
     }
 
     String body = webServer.arg("plain");
     String ssid;
     String password;
     if (!parseWifiCredentials(body, ssid, password)) {
-        return sendError(400, "Invalid or missing JSON fields");
+        return sendMessage(400, "Invalid or missing JSON fields");
     }
 
     if (changeWiFiSTA(ssid, password)) {
@@ -111,8 +111,17 @@ void handleWifiConnect() {
         webServer.send(200, "application/json", ipJson);
         delay(1000);
     } else {
-        sendError(500, "Failed to connect");
+        sendMessage(500, "Failed to connect");
     }
+}
+
+/* reset energy (STA) */
+void handleResetEnergy() {
+    if(!isStaRequest()) return sendMessage(403, "Forbidden");
+    logger.warning("Resetting energy...");
+    configs.resetEnergyValue = getSensorData().energy;
+    configs.save();
+    return sendMessage(200, "OK");
 }
 
 /* get current info about heaf and filesystem (AP & STA) */
@@ -145,11 +154,27 @@ void handleSystemInfo() {
 
 /* restart controller (AP & STA)*/
 void handleRestart() {
-    webServer.send(200, "text/json", "{\"status\": \"Restarting...\"}");
+    sendMessage(200, "Restarting...");
     logger.warning("Restarting...");
     logger.logStorage.save(LOG_FILENAME);
-    delay(500);
+    delay(1000);
     ESP.restart();
+}
+
+/* pause controller (AP & STA)*/
+void handlePause() {
+    if(!running) return sendMessage(403, "Already paused");
+    running = false;
+    sendMessage(200, "Pausing...");
+    logger.warning("Pausing...");
+}
+
+/* resume controller (AP & STA)*/
+void handleResume() {
+    if(running) return sendMessage(403, "Already running");
+    running = true;
+    sendMessage(200, "Resuming...");
+    logger.warning("Resuming...");
 }
 
 /* root handler for AP & STA */
@@ -174,7 +199,11 @@ void handleNotFound() {
 void setupWebServer() {
     webServer.on("/", handleRoot);
     webServer.on("/api/connect-wifi", HTTP_POST, handleWifiConnect);
+    webServer.on("/api/reset-energy", handleResetEnergy);
+
     webServer.on("/api/restart", handleRestart);
+    webServer.on("/api/pause", handlePause);
+    webServer.on("/api/resume", handleResume);
     webServer.on("/api/system-info", handleSystemInfo);
     webServer.onNotFound(handleNotFound);
 

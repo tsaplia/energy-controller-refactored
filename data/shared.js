@@ -1,5 +1,5 @@
 function createSocket(path, onMessage) {
-    const socket = new WebSocket(`ws://${"192.168.178.82"}${path}`);
+    const socket = new WebSocket(`ws://${location.host}${path}`);
     socket.addEventListener("message", onMessage);
     socket.addEventListener("error", (event) => {
         console.log("WebSocket error: ", event);

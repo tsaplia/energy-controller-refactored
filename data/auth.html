@@ -141,8 +141,8 @@
                         }
                     });
                     const json = await res.json();
-                    if (json.error) {
-                        alert(json.error);
+                    if (json.detail) {
+                        alert(json.detail);
                     } else {
                         connectBox.style.display = "none";
                         successBox.style.display = "block";

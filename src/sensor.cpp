@@ -1,11 +1,15 @@
 #include "sensor.h"
 #include <Arduino.h>
 #include <ArduinoJson.h>
+#include "utils.h"
+#include "constants.h"
+#include <globals.h>
 
 ModbusMaster node;
 
 SensorData::SensorData(uint16_t dataArr[]) {
     valid = true;
+    timestamp = time(nullptr);
     voltage = dataArr[0];
     current = (static_cast<uint32_t>(dataArr[2]) << 16) | dataArr[1];
     power = (static_cast<uint32_t>(dataArr[4]) << 16) | dataArr[3];
@@ -14,14 +18,20 @@ SensorData::SensorData(uint16_t dataArr[]) {
     pf = dataArr[8];
 }
 
+SensorData::SensorData() {
+    valid = false;
+    timestamp = time(nullptr);
+}
+
 String SensorData::toJson() {
     if (!valid) return "{}";
 
     JsonDocument doc;
+    doc["time"] = timestamp;
     doc["voltage"] = voltage * 0.1f;
     doc["current"] = current * 0.001f;
     doc["power"] = power * 0.1f;
-    doc["energy"] = energy;
+    doc["energy"] = getFormattedEnergy();
     doc["frequency"] = frequency * 0.1f;
     doc["pf"] = pf * 0.01f;
     String output;
@@ -29,15 +39,34 @@ String SensorData::toJson() {
     return output;
 }
 
+String SensorData::toCsv() {
+    if (!valid) return "";
+    return String(timestamp) + ";"
+            +String(voltage * 0.1f) + ";" + String(current * 0.001f) + ";" 
+            + String(power * 0.1f) + ";" + getFormattedEnergy() + ";" 
+            + String(frequency * 0.1f) + ";" + String(pf * 0.01f) + '\n';
+}
+
+String SensorData::csvHeader() {
+    return "Time;Voltage;Current;Power;Energy;Frequency;Power Factor\n";
+}
+
+String SensorData::getFormattedEnergy() {
+    if (!valid) return "";
+    return String((energy - configs.resetEnergyValue) * 0.001f, 1);
+}
+
 SensorData getSensorData() {
     const int regNum = 9;
     uint16_t dataArr[regNum];
 
+    // TODO: remove
     for(int i = 0; i < regNum; ++i) {
         dataArr[i] = i+1;
     }
 
     return SensorData(dataArr);
+    // TODO: remove end
 
     delay(100);
     Serial.swap();  // switch to sensor
@@ -59,24 +88,3 @@ SensorData getSensorData() {
 
     return SensorData(dataArr);
 }
-
-
-// uint8_t resetEnergy(){
-//     uint8_t result;
-    
-//     delay(100); 
-//     Serial.swap();
-//     Serial.flush();
-    
-//     result = node.resetenergy(); 
-    
-//     Serial.swap();
-//     Serial.flush();
-
-//     energy_config["day"] = (uint32_t)energy_config["day"] - getSensorData().energy; 
-//     energy_config["night"] = (uint32_t)energy_config["day"] - getSensorData().energy;
-//     energy_config["all"] = (uint32_t)energy_config["day"] - getSensorData().energy;
-//     saveOffset();
-    
-//     return result;
-// }

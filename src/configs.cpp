@@ -21,7 +21,10 @@ bool Configs::load() {
 
     ssid = doc["ssid"] | "";
     password = doc["password"] | "";
-    logger.debug("Loaded config: " + doc.as<String>());
+    lastSaveDay = doc["lastSaveDay"] | 0;
+    lastSaveNight = doc["lastSaveNight"] | 0;
+    resetEnergyValue = static_cast<uint32_t>(doc["resetEnergyValue"]) | 0;
+    logger.debug("Loaded config: " + doc.as<String>()); // TODO: remove
     return true;
 }
 
@@ -29,6 +32,9 @@ bool Configs::save() const {
     JsonDocument doc;
     doc["ssid"] = ssid;
     doc["password"] = password;
+    doc["lastSaveDay"] = lastSaveDay;
+    doc["lastSaveNight"] = lastSaveNight;
+    doc["resetEnergyValue"] = resetEnergyValue;
 
     File file = LittleFS.open(filename, "w");
     if (!file) {
@@ -43,6 +49,6 @@ bool Configs::save() const {
     }
 
     file.close();
-    logger.info("Config saved: ssid=" + ssid + ", password=***");
+    logger.info("Config saved");
     return true;
 }
