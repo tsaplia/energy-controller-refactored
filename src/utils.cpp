@@ -3,6 +3,9 @@
 #include <LittleFS.h>
 #include <Esp.h>
 #include "globals.h"
+#include <wifi-tools.h>
+#include <web-server.h>
+#include <sensor.h>
 
 void logSystemInfo() {
     logger.debug("== Chip Info ==");
@@ -56,8 +59,8 @@ bool syncTime() {
     configTime(TIMEZONE_OFFSET_SEC, 0, TIME_SERVER_1, TIME_SERVER_2);
     while (time(nullptr) < 100000) delay(100);
 
-    lastTimerSync = millis();
-    timeSynced = true;
+    appState.lastTimerSync = millis();
+    appState.timeSynced = true;
     logger.info("Time updated");
     return true;
 }
@@ -71,9 +74,4 @@ bool writeFile(const char* path, String message) {
     file.print(message);
     file.close();
     return true;
-}
-
-bool writeEnergy(time_t timestamp, char phase, String formattedEnergy) {
-    String payload = formatTime(timestamp, STATS_DATE_FORMAT) + ";" + String(phase) + ";" + formattedEnergy + "\n";
-    return writeFile(STATS_FILENAME, payload);
 }

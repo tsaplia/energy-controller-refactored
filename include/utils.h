@@ -8,6 +8,5 @@ String getContentType(const String& filename);
 String formatTime(time_t t, const char* format);
 void logSystemInfo();
 bool syncTime();
-bool writeFile(const char* path, String message);
-bool writeEnergy(time_t timestamp, char phase, String formattedEnergy);    
+bool writeFile(const char* path, String message); 
 #endif

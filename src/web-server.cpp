@@ -90,7 +90,7 @@ void sendFile(String path){
     }
 }
 
-/* handle connect request for the AP */
+/* handle connect request for the (AP&STA) */
 void handleWifiConnect() {
     if(!isApRequest()) return sendMessage(403, "Forbidden");
     logger.debug("Got wifi connect request");
@@ -124,7 +124,7 @@ void handleResetEnergy() {
     return sendMessage(200, "OK");
 }
 
-/* get current info about heaf and filesystem (AP & STA) */
+/* get current info about heap and filesystem (AP & STA) */
 void handleSystemInfo() {
     JsonDocument doc;
 
@@ -163,16 +163,16 @@ void handleRestart() {
 
 /* pause controller (AP & STA)*/
 void handlePause() {
-    if(!running) return sendMessage(403, "Already paused");
-    running = false;
+    if(!appState.running) return sendMessage(403, "Already paused");
+    appState.running = false;
     sendMessage(200, "Pausing...");
     logger.warning("Pausing...");
 }
 
 /* resume controller (AP & STA)*/
 void handleResume() {
-    if(running) return sendMessage(403, "Already running");
-    running = true;
+    if(appState.running) return sendMessage(403, "Already running");
+    appState.running = true;
     sendMessage(200, "Resuming...");
     logger.warning("Resuming...");
 }
@@ -197,16 +197,19 @@ void handleNotFound() {
 }
 
 void setupWebServer() {
-    webServer.on("/", handleRoot);
-    webServer.on("/api/connect-wifi", HTTP_POST, handleWifiConnect);
-    webServer.on("/api/reset-energy", handleResetEnergy);
-
+    /* System */
     webServer.on("/api/restart", handleRestart);
     webServer.on("/api/pause", handlePause);
     webServer.on("/api/resume", handleResume);
     webServer.on("/api/system-info", handleSystemInfo);
+
+    /* Pages + API */
+    webServer.on("/", handleRoot);
+    webServer.on("/api/connect-wifi", HTTP_POST, handleWifiConnect);
+    webServer.on("/api/reset-energy", handleResetEnergy);
     webServer.onNotFound(handleNotFound);
 
+    /* Sockets */
     webServer.addHook(logSocket.hookForWebserver("/ws/logs", logSocketEvent));
     webServer.addHook(dataSocket.hookForWebserver("/ws/data", dataSocketEvent));
 

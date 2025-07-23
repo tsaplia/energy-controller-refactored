@@ -69,22 +69,22 @@ SensorData getSensorData() {
     // TODO: remove end
 
     delay(100);
-    Serial.swap();  // switch to sensor
     Serial.flush();
+    Serial.swap();  // switch to sensor
 
     uint8_t result = node.readInputRegisters(0, regNum);
 
     if (result != node.ku8MBSuccess) {
-        Serial.swap();  // restore Serial
         Serial.flush();
+        Serial.swap();  // restore Serial
         return SensorData(); // returns invalid
     } 
 
     for (int i = 0; i < regNum; ++i) {
         dataArr[i] = node.getResponseBuffer(i);
     }
-    Serial.swap();  // restore Serial
     Serial.flush();
+    Serial.swap();  // restore Serial
 
     return SensorData(dataArr);
 }

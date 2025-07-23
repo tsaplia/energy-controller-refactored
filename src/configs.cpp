@@ -24,7 +24,6 @@ bool Configs::load() {
     lastSaveDay = doc["lastSaveDay"] | 0;
     lastSaveNight = doc["lastSaveNight"] | 0;
     resetEnergyValue = static_cast<uint32_t>(doc["resetEnergyValue"]) | 0;
-    logger.debug("Loaded config: " + doc.as<String>()); // TODO: remove
     return true;
 }
 
