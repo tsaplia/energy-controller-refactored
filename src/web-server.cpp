@@ -90,9 +90,15 @@ void sendFile(String path){
     }
 }
 
+void sendCorsHeader() {
+    #if ALLOW_CORS
+    webServer.sendHeader("Access-Control-Allow-Origin", "*");
+    #endif
+}
+
 /* handle connect request for the (AP&STA) */
 void handleWifiConnect() {
-    if(!isApRequest()) return sendMessage(403, "Forbidden");
+    sendCorsHeader();
     logger.debug("Got wifi connect request");
 
     if (webServer.hasArg("plain") == false) {
@@ -113,6 +119,62 @@ void handleWifiConnect() {
     } else {
         sendMessage(500, "Failed to connect");
     }
+}
+
+/* get saved settings (STA) */
+void handleSettingsGet() {
+    sendCorsHeader();
+    if(!isStaRequest()) return sendMessage(403, "Forbidden");
+    logger.debug("Got settings get request");
+
+    JsonDocument doc;
+    configs.toJson(doc, true);
+    String output;
+    serializeJson(doc, output);
+    webServer.send(200, "application/json", output);
+}
+
+void handleSettingsSet() {
+    sendCorsHeader();
+
+    if(!isStaRequest()) return sendMessage(403, "Forbidden");
+    if(!webServer.hasArg("plain")) return sendMessage(400, "Body missing");
+    logger.debug("Got settings set request");
+
+    JsonDocument doc;
+    DeserializationError error = deserializeJson(doc, webServer.arg("plain"));
+    if(error) return sendMessage(400, "JSON parse error");
+
+    if(doc["logLevel"].is<int>()) {
+        if(!logger.logStorage.setLogLevel(doc["logLevel"])) {
+            return sendMessage(400, "Invalid log level");
+        }
+        configs.logLevel = doc["logLevel"];
+    };
+    if(doc["dataSaveInterval"].is<int>()) {
+        configs.dataSaveInterval = doc["dataSaveInterval"];
+    };
+    if(doc["keepData"].is<int>()) {
+        configs.keepData = doc["keepData"];
+    };
+
+    int _dayPhaseOffset = configs.dayPhaseStart - configs.timezoneOffset;
+    int _nightPhaseOffset = configs.nightPhaseStart - configs.timezoneOffset;
+    if(doc["timezoneOffset"].is<int>()) {
+        configs.timezoneOffset = doc["timezoneOffset"];
+        syncTime();
+    };
+    if(doc["dayPhaseStart"].is<int>()) {
+        configs.dayPhaseStart = doc["dayPhaseStart"];
+    };
+    if(doc["nightPhaseStart"].is<int>()) {
+        configs.nightPhaseStart = doc["nightPhaseStart"];
+    };
+    configs.lastSaveDay += configs.dayPhaseStart - configs.timezoneOffset - _dayPhaseOffset;
+    configs.lastSaveNight += configs.nightPhaseStart - configs.timezoneOffset - _nightPhaseOffset;
+    
+    configs.save();
+    sendMessage(200, "OK");
 }
 
 /* reset energy (STA) */
@@ -196,6 +258,15 @@ void handleNotFound() {
     }
 }
 
+void optionsHandler() {
+    #if ALLOW_CORS
+    webServer.sendHeader("Access-Control-Allow-Origin", "*");
+    webServer.sendHeader("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS");
+    webServer.sendHeader("Access-Control-Allow-Headers", "Content-Type");
+    #endif
+    webServer.send(204);
+}
+
 void setupWebServer() {
     /* System */
     webServer.on("/api/restart", handleRestart);
@@ -206,7 +277,12 @@ void setupWebServer() {
     /* Pages + API */
     webServer.on("/", handleRoot);
     webServer.on("/api/connect-wifi", HTTP_POST, handleWifiConnect);
-    webServer.on("/api/reset-energy", handleResetEnergy);
+    webServer.on("/api/connect-wifi", HTTP_OPTIONS, optionsHandler);
+    webServer.on("/api/settings", HTTP_GET, handleSettingsGet);
+    webServer.on("/api/settings", HTTP_POST, handleSettingsSet);
+    webServer.on("/api/settings", HTTP_OPTIONS, optionsHandler);
+    webServer.on("/api/reset-energy", HTTP_PUT, handleResetEnergy);
+    webServer.on("/api/reset-energy", HTTP_OPTIONS, optionsHandler);
     webServer.onNotFound(handleNotFound);
 
     /* Sockets */

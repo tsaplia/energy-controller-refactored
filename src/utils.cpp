@@ -56,7 +56,7 @@ String formatTime(time_t t, const char* format) {
 bool syncTime() {
     if(WiFi.status() != WL_CONNECTED) return false;
 
-    configTime(TIMEZONE_OFFSET_SEC, 0, TIME_SERVER_1, TIME_SERVER_2);
+    configTime(configs.timezoneOffset, 0, TIME_SERVER_1, TIME_SERVER_2);
     while (time(nullptr) < 100000) delay(100);
 
     appState.lastTimerSync = millis();

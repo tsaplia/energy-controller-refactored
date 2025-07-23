@@ -1,6 +1,9 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+#define ALLOW_CORS true
+#define STREAM_ALL_LOGS true
+
 #include <stdint.h>
 #include <ESP8266WiFi.h>
 
@@ -30,6 +33,7 @@ constexpr const char* CONFIGS_FILENAME = "/configs.json";
 /* Data */
 constexpr int DATA_SAVE_INTERVAL_SEC = 30; // 30 seconds
 constexpr const char* DATA_FILENAME = "/sensor-data.csv";
+constexpr int KEEP_DATA_SEC = 1*24*60*60;
 
 /* Day/Night stats*/
 constexpr const char* STATS_FILENAME = "/energy-stats.csv";
@@ -44,7 +48,6 @@ constexpr const char* LOG_FILENAME = "/logs.txt";
 constexpr const char* LOGGER_TIME_FORMAT = "%Y-%m-%d %H:%M:%S";
 constexpr int MAX_LOG_ENTRIES = 200;
 constexpr int LOG_SAVE_INTERVAL = 1000*60*1; // 1 minutes
-constexpr bool STREAM_ALL_LOGS = true; // needs to be changed
 
 /* Time */
 constexpr int SEC_IN_DAY = 60*60*24;

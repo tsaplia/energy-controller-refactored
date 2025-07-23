@@ -22,7 +22,11 @@ void setup() {
     
     if(LittleFS.begin()) {
         logger.debug("LittleFS mounted");
-        if(!configs.load()) logger.warning("No config loaded");
+        if(configs.load()) {
+            logger.logStorage.setLogLevel(configs.logLevel);
+        }
+        else logger.warning("No config loaded");
+        
         if(!logger.logStorage.load(LOG_FILENAME)) logger.warning("Failed to load logs");
     } else {
         logger.error("Failed to mount LittleFS");

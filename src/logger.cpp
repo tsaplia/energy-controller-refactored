@@ -13,9 +13,13 @@ String LogEntry::toFileFormat() const {
 }
 
 void LogStorage::add(const LogEntry& log) {
-    if (STREAM_ALL_LOGS && onNewLog != nullptr) onNewLog(log);
+    #if STREAM_ALL_LOGS
+    if (onNewLog != nullptr) onNewLog(log);
+    #endif
     if (log.level >= logLevel) {
-        if(!STREAM_ALL_LOGS && onNewLog != nullptr) onNewLog(log);
+        #if not STREAM_ALL_LOGS
+        if(onNewLog != nullptr) onNewLog(log);
+        #endif
         logs[firstLogPos] = log;
         firstLogPos = (firstLogPos + 1) % MAX_LOG_ENTRIES;
         if (size < MAX_LOG_ENTRIES) size++;
@@ -24,10 +28,12 @@ void LogStorage::add(const LogEntry& log) {
     }
 }
 
-void LogStorage::setLogLevel(int level) {
-    if (level >= LOG_LEVEL_INFO && level <= LOG_LEVEL_ERROR) {
+bool LogStorage::setLogLevel(int level) {
+    if (level >= LOG_LEVEL_DEBUG && level <= LOG_LEVEL_ERROR) {
         this->logLevel = level;
+        return true;
     }
+    return false;
 }
 
 String LogStorage::getLogs() const {

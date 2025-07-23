@@ -30,16 +30,16 @@ void handleLogSave() {
 /* if we just started counting */ 
 void initEnergySaves(time_t &now) {
     logger.info("Initialiying last energy saves...");
-    configs.lastSaveDay = now - now % SEC_IN_DAY + DAY_PHASE_START - TIMEZONE_OFFSET_SEC;
-    configs.lastSaveNight = now - now % SEC_IN_DAY + NIGHT_PHASE_START - TIMEZONE_OFFSET_SEC;
+    configs.lastSaveDay = now - now % SEC_IN_DAY + configs.dayPhaseStart - configs.timezoneOffset;
+    configs.lastSaveNight = now - now % SEC_IN_DAY + configs.nightPhaseStart - configs.timezoneOffset;
     if(configs.lastSaveDay >= now) configs.lastSaveDay -= SEC_IN_DAY;
     if(configs.lastSaveNight >= now) configs.lastSaveNight -= SEC_IN_DAY;
     
 }
 
 /* TODO: formattedEnergy energy shoulb be without reset value */
-bool writeEnergy(time_t timestamp, char phase, String formattedEnergy) {
-    String payload = formatTime(timestamp, STATS_DATE_FORMAT) + ";" + String(phase) + ";" + formattedEnergy + "\n";
+bool writeEnergy(time_t timestamp, char phase, const String energy) {
+    String payload = formatTime(timestamp, STATS_DATE_FORMAT) + ";" + String(phase) + ";" + energy + "\n";
     return writeFile(STATS_FILENAME, payload);
 }
 
@@ -50,20 +50,14 @@ void saveEnergyStats(time_t &now, SensorData &data) {
         saveNeeded = true;
         logger.info("Saving day data for " + formatTime(configs.lastSaveDay, STATS_DATE_FORMAT) + "...");
         configs.lastSaveDay += SEC_IN_DAY;
-        writeEnergy(configs.lastSaveDay, DAY_PHASE_SYMBOL, data.getFormattedEnergy());
+        writeEnergy(configs.lastSaveDay, DAY_PHASE_SYMBOL, data.getTotalEnergy());
     } 
     while(configs.lastSaveNight + SEC_IN_DAY <= now){
         saveNeeded = true;
         logger.info("Saving night data for " + formatTime(configs.lastSaveNight, STATS_DATE_FORMAT) + "...");
         configs.lastSaveNight += SEC_IN_DAY;
-        writeEnergy(configs.lastSaveNight, NIGHT_PHASE_SYMBOL, data.getFormattedEnergy());
+        writeEnergy(configs.lastSaveNight, NIGHT_PHASE_SYMBOL, data.getTotalEnergy());
     }
-
-    // TODO: remove
-    Serial.println(String(configs.resetEnergyValue)+ ", " +data.energy + String(", ") +data.getFormattedEnergy());
-    configs.resetEnergyValue -= 20;
-    saveNeeded = true;
-    // TODO: remove end
 
     if(saveNeeded) configs.save();
 }
@@ -75,7 +69,7 @@ void handleSensorData() {
     if(!configs.lastSaveDay || !configs.lastSaveNight) initEnergySaves(now);
 
     /* continue only if it's time to get data */
-    if(appState.lastDataGot + DATA_SAVE_INTERVAL_SEC > now) return;
+    if(appState.lastDataGot + configs.dataSaveInterval > now) return;
 
     logger.info("Getting sensor data...");
     SensorData data = getSensorData();
@@ -84,7 +78,7 @@ void handleSensorData() {
             logger.error("Failed to write data to file");
         }
     }
-    appState.lastDataGot = now - now % DATA_SAVE_INTERVAL_SEC; // set even if data is not valid
+    appState.lastDataGot = now - now % configs.dataSaveInterval; // set even if data is not valid
     if(!data.valid) {
         logger.error("Failed to get data");
         return;

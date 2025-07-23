@@ -23,7 +23,7 @@ SensorData::SensorData() {
     timestamp = time(nullptr);
 }
 
-String SensorData::toJson() {
+String SensorData::toJson() const {
     if (!valid) return "{}";
 
     JsonDocument doc;
@@ -31,7 +31,7 @@ String SensorData::toJson() {
     doc["voltage"] = voltage * 0.1f;
     doc["current"] = current * 0.001f;
     doc["power"] = power * 0.1f;
-    doc["energy"] = getFormattedEnergy();
+    doc["energy"] = getEnergy();
     doc["frequency"] = frequency * 0.1f;
     doc["pf"] = pf * 0.01f;
     String output;
@@ -39,11 +39,11 @@ String SensorData::toJson() {
     return output;
 }
 
-String SensorData::toCsv() {
+String SensorData::toCsv() const {
     if (!valid) return "";
     return String(timestamp) + ";"
             +String(voltage * 0.1f) + ";" + String(current * 0.001f) + ";" 
-            + String(power * 0.1f) + ";" + getFormattedEnergy() + ";" 
+            + String(power * 0.1f) + ";" + getEnergy() + ";" 
             + String(frequency * 0.1f) + ";" + String(pf * 0.01f) + '\n';
 }
 
@@ -51,9 +51,14 @@ String SensorData::csvHeader() {
     return "Time;Voltage;Current;Power;Energy;Frequency;Power Factor\n";
 }
 
-String SensorData::getFormattedEnergy() {
-    if (!valid) return "";
+String SensorData::getEnergy() const {
+    if (!valid) return "0.0";
     return String((energy - configs.resetEnergyValue) * 0.001f, 1);
+}
+
+String SensorData::getTotalEnergy() const {
+    if (!valid) return "0.0";
+    return String(energy * 0.001f, 1);
 }
 
 SensorData getSensorData() {

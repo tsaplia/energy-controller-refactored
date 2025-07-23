@@ -17,9 +17,10 @@ struct SensorData {
 
     SensorData();
     SensorData(uint16_t dataArr[]);
-    String toJson();
-    String toCsv();
-    String getFormattedEnergy();
+    String toJson() const;
+    String toCsv() const;
+    String getEnergy() const;
+    String getTotalEnergy() const;
     static String csvHeader();
 };
 

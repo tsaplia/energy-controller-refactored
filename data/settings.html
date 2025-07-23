@@ -4,7 +4,10 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Sensor Interface | Settings</title>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/tsaplia/energy-controller-refactored@main/external-data/bootstrap.min.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/gh/tsaplia/energy-controller-refactored@main/external-data/bootstrap.min.css?v=1"
+        />
         <link rel="stylesheet" href="./style.css" />
     </head>
     <body>
@@ -13,68 +16,16 @@
                 <h1 class="logo">Sensor Interface</h1>
                 <nav class="nav justify-content-center mt-2">
                     <a class="nav-item" href="/" aria-current="page">Data</a>
-                    <a class="active nav-item" href="/settings">Setting</a>
-                    <a class="nav-item" href="/logs">Logs</a>
+                    <a class="active nav-item" href="./settings">Setting</a>
+                    <a class="nav-item" href="./logs">Logs</a>
                 </nav>
             </div>
         </header>
         <main>
-            <section class="container-md">
-                <h2 class="section-header">General</h2>
-                <form>
-                    <div class="form-row align-items-center mb-3">
-                        <div class="col-12 col-md-5 col-lg-4 col-xl-3">
-                            <label for="timezone" class="col-form-label ml-2 ml-md-0">Timezone (e.g. +01:00)</label>
-                        </div>
-                        <div class="col-12 col-sm-8 col-md-4">
-                            <input type="text" class="form-control" id="timezone" placeholder="+00:00" />
-                        </div>
-                        <div class="col-12 col-sm-3 col-lg-2 col-md-3 mt-2 mt-sm-0">
-                            <button type="button" class="btn btn-primary btn-block">Save</button>
-                        </div>
-                    </div>
-
-                    <div class="form-row align-items-center mb-3">
-                        <div class="col-12 col-md-5 col-lg-4 col-xl-3">
-                            <label for="updateFreq" class="col-form-label ml-2 ml-md-0">Update Frequency (sec)</label>
-                        </div>
-                        <div class="col-12 col-sm-8 col-md-4">
-                            <input type="number" class="form-control" id="updateFreq" placeholder="30" />
-                        </div>
-                        <div class="col-12 col-sm-3 col-lg-2 col-md-3 mt-2 mt-sm-0">
-                            <button type="button" class="btn btn-primary btn-block">Save</button>
-                        </div>
-                    </div>
-
-                    <div class="form-row align-items-center mb-3">
-                        <div class="col-12 col-md-5 col-lg-4 col-xl-3">
-                            <label for="keepData" class="col-form-label ml-2 ml-md-0">Keep Data (days)</label>
-                        </div>
-                        <div class="col-12 col-sm-8 col-md-4">
-                            <input type="number" class="form-control" id="keepData" placeholder="3" min="1" />
-                        </div>
-                        <div class="col-12 col-sm-3 col-lg-2 col-md-3 mt-2 mt-sm-0">
-                            <button type="button" class="btn btn-primary btn-block">Save</button>
-                        </div>
-                    </div>
-
-                    <div class="form-row align-items-center mb-3">
-                        <div class="col-12 col-md-5 col-lg-4 col-xl-3">
-                            <label for="saveLogs" class="col-form-label ml-2 ml-md-0">Save Last N Logs</label>
-                        </div>
-                        <div class="col-12 col-sm-8 col-md-4">
-                            <input type="number" class="form-control" id="saveLogs" placeholder="100" min="0" , max="1000" />
-                        </div>
-                        <div class="col-12 col-sm-3 col-lg-2 col-md-3 mt-2 mt-sm-0">
-                            <button type="button" class="btn btn-primary btn-block">Save</button>
-                        </div>
-                    </div>
-                </form>
-            </section>
-            <section class="container-md">
+            <section class="container-md card">
                 <h2 class="section-header">Actions</h2>
                 <form>
-                    <div class="form-row align-items-center flex-sm-nowrap mb-3">
+                    <div class="form-row align-items-center flex-sm-nowrap mb-4">
                         <div class="col-12 col-sm-4 col-md-3 col-lg-2 mr-sm-3">
                             <button type="button" class="btn btn-primary btn-block">Get Energy File</button>
                         </div>
@@ -82,7 +33,7 @@
                             <span class="col-form-label text-muted">Get File sdfds asdsad asdasds asdasdasdblashak akjdshkas</span>
                         </div>
                     </div>
-                    <div class="form-row align-items-center flex-sm-nowrap mb-3">
+                    <div class="form-row align-items-center flex-sm-nowrap mb-4">
                         <div class="col-12 col-sm-4 col-md-3 col-lg-2 mr-sm-3">
                             <button type="button" class="btn btn-primary btn-block">Get Sensor File</button>
                         </div>
@@ -90,7 +41,7 @@
                             <span class="col-form-label text-muted">Get File sdfds asdsad asdasds asdasdasdblashak akjdshkas</span>
                         </div>
                     </div>
-                    <div class="form-row align-items-center flex-sm-nowrap mb-3">
+                    <div class="form-row align-items-center flex-sm-nowrap mb-4">
                         <div class="col-12 col-sm-4 col-md-3 col-lg-2 mr-sm-3">
                             <button type="button" class="btn btn-primary btn-block">Reset Enegry</button>
                         </div>
@@ -100,7 +51,69 @@
                     </div>
                 </form>
             </section>
-            <section class="container-md">
+            <section class="container-md card">
+                <h2 class="section-header">General</h2>
+                <form>
+                    <div class="form-row align-items-center mb-3">
+                        <div class="col-12 col-sm-6 col-md-5 col-lg-4 col-xl-3">
+                            <label for="timezoneOffset" class="col-form-label ml-2 ml-md-0">Timezone (e.g. +01:00)</label>
+                        </div>
+                        <div class="col-12 col-sm-4 col-md-4">
+                            <input type="text" class="form-control" id="timezoneOffset" placeholder="+01:00" />
+                        </div>
+                    </div>
+                    <div class="form-row align-items-center mb-3">
+                        <div class="col-12 col-sm-6 col-md-5 col-lg-4 col-xl-3">
+                            <label for="dayPhaseStart" class="col-form-label ml-2 ml-md-0">Day phase start time</label>
+                        </div>
+                        <div class="col-12 col-sm-4 col-md-4">
+                            <input type="text" class="form-control" id="dayPhaseStart" placeholder="07:00" />
+                        </div>
+                    </div>
+                    <div class="form-row align-items-center mb-3">
+                        <div class="col-12 col-sm-6 col-md-5 col-lg-4 col-xl-3">
+                            <label for="nightPhaseStart" class="col-form-label ml-2 ml-md-0">Night phase start time</label>
+                        </div>
+                        <div class="col-12 col-sm-4 col-md-4">
+                            <input type="text" class="form-control" id="nightPhaseStart" placeholder="23:00" />
+                        </div>
+                    </div>
+                    <div class="form-row align-items-center mb-3">
+                        <div class="col-12 col-sm-6 col-md-5 col-lg-4 col-xl-3">
+                            <label for="dataSaveInterval" class="col-form-label ml-2 ml-md-0">Data update frequency (sec)</label>
+                        </div>
+                        <div class="col-12 col-sm-4 col-md-4">
+                            <input type="number" class="form-control" id="dataSaveInterval" placeholder="30" min="1"/>
+                        </div>
+                    </div>
+                    <div class="form-row align-items-center mb-3">
+                        <div class="col-12 col-sm-6 col-md-5 col-lg-4 col-xl-3">
+                            <label for="keepData" class="col-form-label ml-2 ml-md-0">Keep data for (hours)</label>
+                        </div>
+                        <div class="col-12 col-sm-4 col-md-4">
+                            <input type="text" class="form-control" id="keepData" placeholder="24" />
+                        </div>
+                    </div>
+                    <div class="form-row align-items-center mb-3">
+                        <div class="col-12 col-sm-6 col-md-5 col-lg-4 col-xl-3">
+                            <label for="logLevel" class="col-form-label ml-2 ml-md-0">Log level</label>
+                        </div>
+                        <div class="col-12 col-sm-4 col-md-4">
+                            <select class="form-control" id="logLevel" placeholder="INFO">
+                                <option value="1">INFO</option>
+                                <option value="2">WARNING</option>
+                                <option value="3">ERROR</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3 form-row mt-4">
+                        <div class="col-12 col-sm-3 col-lg-auto">
+                            <button onclick="saveSettings(event)" type="button" class="btn btn-primary btn-block pr-lg-5 pl-lg-5">Save</button>
+                        </div>
+                    </div>
+                </form>
+            </section>
+            <section class="container-md card">
                 <h2 class="section-header">Wifi</h2>
                 <form>
                     <div class="form-row align-items-center mb-3">
@@ -126,32 +139,7 @@
                     </div>
                 </form>
             </section>
-            <section class="container-md">
-                <h2 class="section-header">Phases</h2>
-                <form>
-                    <div class="form-row align-items-center mb-3">
-                        <div class="col-12 col-sm-6 col-md-5 col-lg-4 col-xl-3">
-                            <label for="dayPhase" class="col-form-label ml-2 ml-md-0">Day phase start</label>
-                        </div>
-                        <div class="col-12 col-sm-4 col-md-4">
-                            <input type="text" class="form-control" id="dayPhase" placeholder="01:00" />
-                        </div>
-                    </div>
-                    <div class="form-row align-items-center mb-3">
-                        <div class="col-12 col-sm-6 col-md-5 col-lg-4 col-xl-3">
-                            <label for="nightPhase" class="col-form-label ml-2 ml-md-0">Night phase start</label>
-                        </div>
-                        <div class="col-12 col-sm-4 col-md-4">
-                            <input type="text" class="form-control" id="nightPhase" placeholder="17:00" />
-                        </div>
-                    </div>
-                    <div class="mb-3 form-row mt-4">
-                        <div class="col-12 col-sm-3 col-lg-auto">
-                            <button class="btn btn-primary btn-block pr-lg-5 pl-lg-5">Save</button>
-                        </div>
-                    </div>
-                </form>
-            </section>
         </main>
+        <script src="./settings.js"></script>
     </body>
 </html>

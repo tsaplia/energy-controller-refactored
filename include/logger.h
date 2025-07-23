@@ -32,7 +32,7 @@ private:
     
 public:
     void add(const LogEntry& log);
-    void setLogLevel(int level);
+    bool setLogLevel(int level);
     String getLogs() const;
     void onNew(std::function<void(const LogEntry&)> callback);
     bool load(const char* filename);
