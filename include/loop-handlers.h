@@ -4,5 +4,6 @@
 void handleWifiConnection();
 void handleLogSave();
 void handleSensorData();
+void handleEspRestart();
 
 #endif

@@ -1,5 +1,5 @@
 google.charts.load("current", { packages: ["corechart"] });
-google.charts.setOnLoadCallback(drawChart);
+google.charts.setOnLoadCallback(drawCharts);
 
 const valueEls = document.querySelectorAll(".value");
 const valueNames = ["voltage", "current", "power", "energy", "frequency", "pf"];
@@ -12,8 +12,9 @@ createSocket("/ws/data", (event) => {
     }
 });
 
-requestFile("/sensor-data.csv")
-    .then((text) => {
+async function drawCharts(){
+    try {
+        const text = await requestFile("/sensor-data.csv");
         const fullRows = text
             .split("\n")
             .slice(1, -1)
@@ -22,13 +23,14 @@ requestFile("/sensor-data.csv")
         const powerRows = fullRows.map((row) => [new Date(row[0] * 1000), +row[3]]);
         drawChart(voltageRows, "voltageChart");
         drawChart(powerRows, "powerChart");
-    })
-    .catch((e) => {
+    } catch (e) {
         console.error(e);
         alert(e.message);
-    });
+    }
+}
 
 function drawChart(dataRows, id) {
+    if(!dataRows.length) return;
     const fullRows = dataRows.map((row) => [...row, getTooltip(row)]);
     const data = google.visualization.arrayToDataTable([
         [

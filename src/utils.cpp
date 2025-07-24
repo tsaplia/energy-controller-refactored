@@ -46,10 +46,21 @@ bool syncTime() {
     configTime(configs.timezoneOffset, 0, TIME_SERVER_1, TIME_SERVER_2);
     while (time(nullptr) < 100000) delay(100);
 
+    if(!appState.timeSynced) {
+        appState.lastRestart = time(nullptr) - time(nullptr) % RESTART_INTERVAL_SEC;
+    }
+
     appState.lastTimerSync = millis();
     appState.timeSynced = true;
     logger.info("Time updated");
     return true;
+}
+
+void restart() {
+    logger.warning("Restarting...");
+    logger.logStorage.save(LOG_FILENAME);
+    delay(1000);
+    ESP.restart();
 }
 
 bool writeFile(const char* path, String message) {
@@ -60,5 +71,39 @@ bool writeFile(const char* path, String message) {
     }
     file.print(message);
     file.close();
+    return true;
+}
+
+bool clearOldData(){
+    time_t now = time(nullptr);
+    const char* tempFilename = "/temp.txt";
+    File input = LittleFS.open(DATA_FILENAME, "r");
+    if (!input) return false;
+
+    File output = LittleFS.open(tempFilename, "w");
+    if (!output) {
+        input.close();
+        return false;
+    }
+
+    if(input.available()) {
+        input.readStringUntil('\n');
+    }
+    output.print(SensorData::csvHeader());
+    while(input.available()){
+        String line = input.readStringUntil('\n');
+        line.trim();
+        int timeEnd = line.indexOf(';');
+        if (timeEnd == -1) continue;
+        time_t timestamp = line.substring(0, timeEnd).toInt();
+        if(timestamp > now - configs.keepData) {
+            output.println(line);
+        }
+    }
+    input.close();
+    output.close();
+
+    LittleFS.remove(DATA_FILENAME);
+    LittleFS.rename(tempFilename, DATA_FILENAME);
     return true;
 }

@@ -34,6 +34,7 @@ constexpr const char* CONFIGS_FILENAME = "/configs.json";
 constexpr int DATA_SAVE_INTERVAL_SEC = 30; // 30 seconds
 constexpr const char* DATA_FILENAME = "/sensor-data.csv";
 constexpr int KEEP_DATA_SEC = 1*24*60*60;
+constexpr int RESTART_INTERVAL_SEC = 24*60*60;
 
 /* Day/Night stats*/
 constexpr const char* STATS_FILENAME = "/energy-stats.csv";

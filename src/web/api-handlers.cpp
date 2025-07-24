@@ -70,7 +70,7 @@ void handleSettingsSet() {
     configs.fromJson(doc, true);
     configs.lastSaveDay += configs.dayPhaseStart - configs.timezoneOffset - _dayPhaseOffset;
     configs.lastSaveNight += configs.nightPhaseStart - configs.timezoneOffset - _nightPhaseOffset;
-    
+
     configs.save();
     sendMessage(200, "OK");
 }
@@ -115,10 +115,13 @@ void handleSystemInfo() {
 /* restart controller (AP & STA)*/
 void handleRestart() {
     sendMessage(200, "Restarting...");
-    logger.warning("Restarting...");
-    logger.logStorage.save(LOG_FILENAME);
-    delay(1000);
-    ESP.restart();
+    restart();
+}
+
+/* clear old sensor data (AP & STA)*/
+void handleClearOldData() {
+    if(clearOldData()) sendMessage(200, "Cleared old data");
+    else sendMessage(500, "Failed to clear old data");
 }
 
 /* pause controller (AP & STA)*/

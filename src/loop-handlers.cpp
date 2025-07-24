@@ -4,6 +4,7 @@
 #include "sensor.h"
 #include "web/web-server.h"
 #include "web/web-utils.h"
+#include <LittleFS.h>
 
 /* Logic for handling WiFi connection in the main loop */
 void handleWifiConnection() {
@@ -35,10 +36,9 @@ void initEnergySaves(time_t &now) {
     configs.lastSaveNight = now - now % SEC_IN_DAY + configs.nightPhaseStart - configs.timezoneOffset;
     if(configs.lastSaveDay >= now) configs.lastSaveDay -= SEC_IN_DAY;
     if(configs.lastSaveNight >= now) configs.lastSaveNight -= SEC_IN_DAY;
-    
+    configs.save();
 }
 
-/* TODO: formattedEnergy energy shoulb be without reset value */
 bool writeEnergy(time_t timestamp, char phase, const String energy) {
     String payload = formatTime(timestamp, STATS_DATE_FORMAT) + ";" + String(phase) + ";" + energy + "\n";
     return writeFile(STATS_FILENAME, payload);
@@ -90,4 +90,13 @@ void handleSensorData() {
     dataSocket.broadcastTXT(payload);
 
     saveEnergyStats(now, data);
+}
+
+void handleEspRestart() {
+    if(time(nullptr) - appState.lastRestart < RESTART_INTERVAL_SEC) return;
+    if(appState.timeSynced) {
+        if(clearOldData()) logger.info("Cleared old data");
+        else logger.error("Failed to clear old data");
+    }
+    restart();
 }

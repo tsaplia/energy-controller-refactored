@@ -69,8 +69,10 @@ void loop() {
     if(appState.running) { 
         // if data collection / processing is not paused
         if(!appState.timeSynced ||  millis() - appState.lastTimerSync >= TIME_SYNC_INTERVAL) syncTime(); 
-        handleLogSave();    
+        handleLogSave();
+        handleEspRestart();
         if(appState.timeSynced) handleSensorData();
+
     }
     delay(100);
 }

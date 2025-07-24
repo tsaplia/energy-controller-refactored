@@ -61,6 +61,7 @@ void setupWebServer() {
     webServer.on("/api/pause", handlePause);
     webServer.on("/api/resume", handleResume);
     webServer.on("/api/system-info", handleSystemInfo);
+    webServer.on("/api/clear-old", handleClearOldData);
 
     /* Pages + API */
     webServer.on("/", handleRoot);

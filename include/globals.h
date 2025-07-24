@@ -12,7 +12,8 @@ struct AppState {
 
     unsigned long lastTimerSync = 0;
     unsigned long lastLogSave = 0;
-    unsigned long lastDataGot = 0;  // should be multiple of dataSaveInterval
+    time_t lastDataGot = 0;  // should be multiple of dataSaveInterval
+    time_t lastRestart = 0; 
 };
 
 extern Configs configs;

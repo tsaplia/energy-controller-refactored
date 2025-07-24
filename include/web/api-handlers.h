@@ -7,6 +7,7 @@ void handleSettingsSet();
 void handleResetEnergy();
 void handleSystemInfo();
 void handleRestart();
+void handleClearOldData();
 void handlePause();
 void handleResume();
 

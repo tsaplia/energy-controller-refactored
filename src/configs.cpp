@@ -39,7 +39,7 @@ bool Configs::save() const {
     }
 
     file.close();
-    Serial.println(doc.as<String>());
+
     logger.info("Config saved");
     return true;
 }
