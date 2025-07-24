@@ -125,8 +125,6 @@
             const btn = document.querySelector("button");
 
             async function connectToWifi() {
-                ssidInput.blur();
-                passInput.blur();
                 const ssid = ssidInput.value;
                 const password = passInput.value;
                 if (!ssid || !password) return;
@@ -150,7 +148,7 @@
                         ip.href = "http://" + json.ip;
                     }
                 } catch (e) {
-                    console.log(e)
+                    console.error(e)
                     alert("Failed to fetch. Check Connection");
                 } finally {
                     btn.disabled = false;

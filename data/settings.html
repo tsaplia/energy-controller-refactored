@@ -24,42 +24,42 @@
         <main>
             <section class="container-md card">
                 <h2 class="section-header">Actions</h2>
-                <form>
-                    <div class="form-row align-items-center flex-sm-nowrap mb-4">
-                        <div class="col-12 col-sm-4 col-md-3 col-lg-2 mr-sm-3">
-                            <button type="button" class="btn btn-primary btn-block">Get Energy File</button>
+                <form onsubmit="return false">
+                    <div class="form-row align-items-center flex-sm-nowrap flex-sm-row-reverse mb-4">
+                        <div class="flex-grow-1 ml-2">
+                            <span class="col-form-label text-muted">Download daily energy usage summary (day, night, total)</span>
                         </div>
-                        <div class="flex-grow-1">
-                            <span class="col-form-label text-muted">Get File sdfds asdsad asdasds asdasdasdblashak akjdshkas</span>
+                        <div class="col-12 col-sm-4 col-md-3 col-lg-2 mr-sm-3">
+                            <button onclick="getEnergyStatsFile(event)" type="button" class="btn btn-primary btn-block">Energy Stats</button>
                         </div>
                     </div>
-                    <div class="form-row align-items-center flex-sm-nowrap mb-4">
-                        <div class="col-12 col-sm-4 col-md-3 col-lg-2 mr-sm-3">
-                            <button type="button" class="btn btn-primary btn-block">Get Sensor File</button>
+                    <div class="form-row align-items-center flex-sm-nowrap flex-sm-row-reverse mb-4">
+                        <div class="flex-grow-1 ml-2">
+                            <span class="col-form-label text-muted">Download raw sensor data</span>
                         </div>
-                        <div class="flex-grow-1">
-                            <span class="col-form-label text-muted">Get File sdfds asdsad asdasds asdasdasdblashak akjdshkas</span>
+                        <div class="col-12 col-sm-4 col-md-3 col-lg-2 mr-sm-3">
+                            <button onclick="getSensorDataFile(event)" type="button" class="btn btn-primary btn-block">Sensor Data</button>
                         </div>
                     </div>
-                    <div class="form-row align-items-center flex-sm-nowrap mb-4">
-                        <div class="col-12 col-sm-4 col-md-3 col-lg-2 mr-sm-3">
-                            <button type="button" class="btn btn-primary btn-block">Reset Enegry</button>
+                    <div class="form-row align-items-center flex-sm-nowrap flex-sm-row-reverse mb-4">
+                        <div class="flex-grow-1 ml-2">
+                            <span class="col-form-label text-muted">Reset the energy counter to zero</span>
                         </div>
-                        <div class="flex-grow-1">
-                            <span class="col-form-label text-muted">Get File sdfds asdsad asdasds asdasdasdblashak akjdshkas</span>
+                        <div class="col-12 col-sm-4 col-md-3 col-lg-2 mr-sm-3">
+                            <button onclick="resetEnergy(event)" type="button" class="btn btn-primary btn-block">Reset Enegry</button>
                         </div>
                     </div>
                 </form>
             </section>
             <section class="container-md card">
                 <h2 class="section-header">General</h2>
-                <form>
+                <form onsubmit="return false">
                     <div class="form-row align-items-center mb-3">
                         <div class="col-12 col-sm-6 col-md-5 col-lg-4 col-xl-3">
                             <label for="timezoneOffset" class="col-form-label ml-2 ml-md-0">Timezone (e.g. +01:00)</label>
                         </div>
                         <div class="col-12 col-sm-4 col-md-4">
-                            <input type="text" class="form-control" id="timezoneOffset" placeholder="+01:00" />
+                            <input type="text" class="form-control" id="timezoneOffset" />
                         </div>
                     </div>
                     <div class="form-row align-items-center mb-3">
@@ -67,7 +67,7 @@
                             <label for="dayPhaseStart" class="col-form-label ml-2 ml-md-0">Day phase start time</label>
                         </div>
                         <div class="col-12 col-sm-4 col-md-4">
-                            <input type="text" class="form-control" id="dayPhaseStart" placeholder="07:00" />
+                            <input type="text" class="form-control" id="dayPhaseStart" />
                         </div>
                     </div>
                     <div class="form-row align-items-center mb-3">
@@ -75,7 +75,7 @@
                             <label for="nightPhaseStart" class="col-form-label ml-2 ml-md-0">Night phase start time</label>
                         </div>
                         <div class="col-12 col-sm-4 col-md-4">
-                            <input type="text" class="form-control" id="nightPhaseStart" placeholder="23:00" />
+                            <input type="text" class="form-control" id="nightPhaseStart" />
                         </div>
                     </div>
                     <div class="form-row align-items-center mb-3">
@@ -83,7 +83,7 @@
                             <label for="dataSaveInterval" class="col-form-label ml-2 ml-md-0">Data update frequency (sec)</label>
                         </div>
                         <div class="col-12 col-sm-4 col-md-4">
-                            <input type="number" class="form-control" id="dataSaveInterval" placeholder="30" min="1"/>
+                            <input type="number" class="form-control" id="dataSaveInterval"/>
                         </div>
                     </div>
                     <div class="form-row align-items-center mb-3">
@@ -91,7 +91,7 @@
                             <label for="keepData" class="col-form-label ml-2 ml-md-0">Keep data for (hours)</label>
                         </div>
                         <div class="col-12 col-sm-4 col-md-4">
-                            <input type="text" class="form-control" id="keepData" placeholder="24" />
+                            <input type="text" class="form-control" id="keepData" />
                         </div>
                     </div>
                     <div class="form-row align-items-center mb-3">
@@ -99,7 +99,7 @@
                             <label for="logLevel" class="col-form-label ml-2 ml-md-0">Log level</label>
                         </div>
                         <div class="col-12 col-sm-4 col-md-4">
-                            <select class="form-control" id="logLevel" placeholder="INFO">
+                            <select class="form-control" id="logLevel">
                                 <option value="1">INFO</option>
                                 <option value="2">WARNING</option>
                                 <option value="3">ERROR</option>
@@ -115,7 +115,7 @@
             </section>
             <section class="container-md card">
                 <h2 class="section-header">Wifi</h2>
-                <form>
+                <form onsubmit="return false">
                     <div class="form-row align-items-center mb-3">
                         <div class="col-12 col-lg-3 col-xl-4">
                             <label for="wifiName" class="col-form-label ml-2 ml-lg-0">Name</label>
@@ -134,12 +134,13 @@
                     </div>
                     <div class="mb-3 form-row mt-4">
                         <div class="col-12 col-sm-3 col-lg-auto">
-                            <button class="btn btn-primary btn-block pr-lg-5 pl-lg-5">Connect</button>
+                            <button onclick="connectToWifi(event)" type="button" class="btn btn-primary btn-block pr-lg-5 pl-lg-5">Connect</button>
                         </div>
                     </div>
                 </form>
             </section>
         </main>
+        <script src="./shared.js"></script>
         <script src="./settings.js"></script>
     </body>
 </html>

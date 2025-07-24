@@ -68,8 +68,17 @@ void sendRootRedirect() {
     webServer.send(302, "text/plain", "");
 }
 
+/* allow all CORS requests */
+void sendCorsHeader() {
+    #if ALLOW_CORS
+    webServer.sendHeader("Access-Control-Allow-Origin", "*");
+    #endif
+}
+
+
 /* send an error to the client */
 void sendMessage(int code, const char* message) {
+    sendCorsHeader();
     logger.debug("Sending message " + String(code) + ": " + message);
     webServer.send(code, "application/json", "{\"detail\": \"" + String(message) + "\"}");
 }
@@ -81,6 +90,7 @@ void sendFile(String path){
 
     String contentType = getContentType(path);
     if(LittleFS.exists(path)){
+        sendCorsHeader();
         logger.debug("Sending file " + path);
         File file = LittleFS.open(path, "r");
         webServer.streamFile(file, contentType);
@@ -90,34 +100,27 @@ void sendFile(String path){
     }
 }
 
-void sendCorsHeader() {
-    #if ALLOW_CORS
-    webServer.sendHeader("Access-Control-Allow-Origin", "*");
-    #endif
-}
-
 /* handle connect request for the (AP&STA) */
 void handleWifiConnect() {
     sendCorsHeader();
+    if (!webServer.hasArg("plain")) return sendMessage(400, "Body missing");
     logger.debug("Got wifi connect request");
 
-    if (webServer.hasArg("plain") == false) {
-        return sendMessage(400, "Body missing");
-    }
+    JsonDocument doc;
+    DeserializationError error = deserializeJson(doc, webServer.arg("plain"));
+    if(error) return sendMessage(400, "JSON parse error");
+    String ssid = doc["ssid"] | "";
+    String password = doc["password"] | "";
+    if(ssid.length() == 0 || password.length() == 0) return sendMessage(400, "Missing credentials");
 
-    String body = webServer.arg("plain");
-    String ssid;
-    String password;
-    if (!parseWifiCredentials(body, ssid, password)) {
-        return sendMessage(400, "Invalid or missing JSON fields");
-    }
+    if (isStaRequest()) sendMessage(200, "OK"); // won't be able to see result in STA mode
 
     if (changeWiFiSTA(ssid, password)) {
         String ipJson = "{\"ip\":\"" + WiFi.localIP().toString() + "\"}";
-        webServer.send(200, "application/json", ipJson);
-        delay(1000);
+        if(isApRequest()) webServer.send(200, "application/json", ipJson);
+        delay(500);
     } else {
-        sendMessage(500, "Failed to connect");
+        if(isApRequest()) sendMessage(500, "Failed to connect");
     }
 }
 

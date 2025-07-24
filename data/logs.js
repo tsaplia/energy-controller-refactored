@@ -8,7 +8,7 @@ createSocket("/ws/logs", (event) => {
     } else if (json.type === "log") {
         addLog(json.data);
     } else {
-        console.log("Unknown message type: " + json.type);
+        console.error("Unknown message type: " + json.type);
     }
 });
 

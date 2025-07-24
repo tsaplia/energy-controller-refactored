@@ -48,14 +48,14 @@ void saveEnergyStats(time_t &now, SensorData &data) {
     bool saveNeeded = false;
     while(configs.lastSaveDay + SEC_IN_DAY <= now){
         saveNeeded = true;
-        logger.info("Saving day data for " + formatTime(configs.lastSaveDay, STATS_DATE_FORMAT) + "...");
         configs.lastSaveDay += SEC_IN_DAY;
+        logger.info("Saving day data for " + formatTime(configs.lastSaveDay, STATS_DATE_FORMAT) + "...");
         writeEnergy(configs.lastSaveDay, DAY_PHASE_SYMBOL, data.getTotalEnergy());
     } 
     while(configs.lastSaveNight + SEC_IN_DAY <= now){
         saveNeeded = true;
-        logger.info("Saving night data for " + formatTime(configs.lastSaveNight, STATS_DATE_FORMAT) + "...");
         configs.lastSaveNight += SEC_IN_DAY;
+        logger.info("Saving night data for " + formatTime(configs.lastSaveNight, STATS_DATE_FORMAT) + "...");
         writeEnergy(configs.lastSaveNight, NIGHT_PHASE_SYMBOL, data.getTotalEnergy());
     }
 

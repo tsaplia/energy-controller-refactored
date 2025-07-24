@@ -93,6 +93,10 @@ section {
 .card-body.value::-webkit-scrollbar {
     display: none;
 }
+div.google-visualization-tooltip {
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.5rem;
+}
 
 /* Settings */
 input {
@@ -107,14 +111,14 @@ input {
 
 /*Selection*/
 *::selection {
-  background: var(--secondary);
-  color: #ffffff;
+    background: var(--secondary);
+    color: #ffffff;
 }
 *::-moz-selection {
-  background: var(--secondary);
-  color: #ffffff;
+    background: var(--secondary);
+    color: #ffffff;
 }
 *::-webkit-selection {
-  background: var(--secondary);
-  color: #ffffff;
+    background: var(--secondary);
+    color: #ffffff;
 }
