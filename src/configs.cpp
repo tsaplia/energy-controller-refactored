@@ -18,19 +18,7 @@ bool Configs::load() {
         return false;
     }
 
-    ssid = doc["ssid"] | "";
-    password = doc["password"] | "";
-
-    lastSaveDay = doc["lastSaveDay"] | 0;
-    lastSaveNight = doc["lastSaveNight"] | 0;
-    resetEnergyValue = static_cast<uint32_t>(doc["resetEnergyValue"]) | 0;
-
-    logLevel = doc["logLevel"] | LOG_LEVEL_INFO;
-    dataSaveInterval = doc["dataSaveInterval"] | DATA_SAVE_INTERVAL_SEC;
-    keepData = doc["keepData"] | KEEP_DATA_SEC;
-    timezoneOffset = doc["timezoneOffset"] | TIMEZONE_OFFSET_SEC;
-    dayPhaseStart = doc["dayPhaseStart"] | DAY_PHASE_START;
-    nightPhaseStart = doc["nightPhaseStart"] | NIGHT_PHASE_START;
+    fromJson(doc);
     return true;
 }
 
@@ -51,6 +39,7 @@ bool Configs::save() const {
     }
 
     file.close();
+    Serial.println(doc.as<String>());
     logger.info("Config saved");
     return true;
 }
@@ -69,5 +58,30 @@ void Configs::toJson(JsonDocument& doc, bool settingsOnly) const {
         doc["lastSaveDay"] = lastSaveDay;
         doc["lastSaveNight"] = lastSaveNight;
         doc["resetEnergyValue"] = resetEnergyValue;
+    }
+}
+
+template<typename T>
+bool assignIfExists(const JsonDocument& doc, const char* key, T& target) {
+    if(doc[key].is<T>()) {
+        target = doc[key].as<T>();
+        return true;
+    }
+    return false;
+}
+
+void Configs::fromJson(const JsonDocument &doc, bool settingsOnly) {
+    assignIfExists(doc, "logLevel", logLevel);
+    assignIfExists(doc, "dataSaveInterval", dataSaveInterval);
+    assignIfExists(doc, "keepData", keepData);
+    assignIfExists(doc, "timezoneOffset", timezoneOffset);
+    assignIfExists(doc, "dayPhaseStart", dayPhaseStart);
+    assignIfExists(doc, "nightPhaseStart", nightPhaseStart);
+    if(!settingsOnly) {
+        assignIfExists(doc, "ssid", ssid);
+        assignIfExists(doc, "password", password);
+        assignIfExists(doc, "lastSaveDay", lastSaveDay);
+        assignIfExists(doc, "lastSaveNight", lastSaveNight);
+        assignIfExists(doc, "resetEnergyValue", resetEnergyValue);
     }
 }

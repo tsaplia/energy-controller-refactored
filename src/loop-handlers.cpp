@@ -2,7 +2,8 @@
 #include "globals.h"
 #include "utils.h"
 #include "sensor.h"
-#include "web-server.h"
+#include "web/web-server.h"
+#include "web/web-utils.h"
 
 /* Logic for handling WiFi connection in the main loop */
 void handleWifiConnection() {

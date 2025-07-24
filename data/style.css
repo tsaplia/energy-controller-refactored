@@ -93,6 +93,9 @@ section {
 .card-body.value::-webkit-scrollbar {
     display: none;
 }
+.chart {
+    padding-bottom: 0.5rem !important;
+}
 div.google-visualization-tooltip {
     border-radius: 0.25rem;
     padding: 0.25rem 0.5rem;

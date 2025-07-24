@@ -13,6 +13,7 @@ public:
     bool load();
     bool save() const;
     void toJson(JsonDocument& doc, bool settingsOnly = false) const;
+    void fromJson(const JsonDocument& doc, bool settingsOnly = false);
 
     /* Wifi */
     String ssid;

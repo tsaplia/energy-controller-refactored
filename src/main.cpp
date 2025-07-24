@@ -3,7 +3,7 @@
 #include <LittleFS.h>
 #include <FTPServer.h>
 #include "constants.h"
-#include "web-server.h"
+#include "web/web-server.h"
 #include "wifi-tools.h"
 #include "configs.h"
 #include "globals.h"

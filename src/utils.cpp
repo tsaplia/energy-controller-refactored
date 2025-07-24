@@ -4,8 +4,7 @@
 #include <Esp.h>
 #include "globals.h"
 #include <wifi-tools.h>
-#include <web-server.h>
-#include <sensor.h>
+#include "sensor.h"
 
 void logSystemInfo() {
     logger.debug("== Chip Info ==");
@@ -32,18 +31,6 @@ void logSystemInfo() {
     float usedKB = fsInfo.usedBytes / 1024.0;
     logger.debug("Total space: " + String(totalKB, 2) + " KB");
     logger.debug("Used space: " + String(usedKB, 2) + " KB");
-}
-
-String getContentType(const String& filename) {
-    if (filename.endsWith(".html")) return "text/html";
-    else if (filename.endsWith(".css")) return "text/css";
-    else if (filename.endsWith(".csv")) return "text/csv";
-    else if (filename.endsWith(".js")) return "application/javascript";
-    else if (filename.endsWith(".png")) return "image/png";
-    else if (filename.endsWith(".jpg")) return "image/jpeg";
-    else if (filename.endsWith(".gif")) return "image/gif";
-    else if (filename.endsWith(".ico")) return "image/x-icon";
-    return "text/plain";
 }
   
 String formatTime(time_t t, const char* format) {

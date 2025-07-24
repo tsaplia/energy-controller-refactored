@@ -8,7 +8,6 @@ extern ESP8266WebServer webServer;
 extern WebSockets4WebServer logSocket;
 extern WebSockets4WebServer dataSocket;
 
-String getSocketPayload(const String& type, const String& msg, bool wrap = true);
 void setupWebServer();
 
 #endif
