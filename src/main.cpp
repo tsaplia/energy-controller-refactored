@@ -12,11 +12,8 @@
 #include "loop-handlers.h"
 
 void setup() {
-    Serial.begin(115200);
-
-    // TODO: add
-    // Serial.begin(9600); 
-    // node.begin(0xF8, Serial);
+    Serial.begin(9600); 
+    node.begin(0xF8, Serial);
 
     logger.debug("Booting Sketch...");
     

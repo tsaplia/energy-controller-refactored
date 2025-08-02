@@ -1,8 +1,8 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-#define ALLOW_CORS true
-#define STREAM_ALL_LOGS true
+#define ALLOW_CORS false
+#define STREAM_ALL_LOGS false
 
 #include <stdint.h>
 #include <ESP8266WiFi.h>
@@ -20,8 +20,8 @@ const IPAddress AP_IP(192, 168, 4, 1);
 constexpr const char* OTA_HOSTNAME = "esp8266";
 constexpr uint16_t OTA_PORT = 8266;
 
-constexpr const char* FTP_USER = "";
-constexpr const char* FTP_PASSWORD = "";
+constexpr const char* FTP_USER = "esp";
+constexpr const char* FTP_PASSWORD = "password";
 
 constexpr int WIFI_CONNECT_DELAY = 500;
 constexpr int WIFI_CONNECT_TRIES = 15;

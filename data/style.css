@@ -2,7 +2,7 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background-color: var(--light);
+    background-color: #eee;
     color: var(--dark);
 }
 main {
@@ -13,7 +13,7 @@ main {
 
 /* Header */
 header {
-    padding: 1rem 0 2.5rem 0;
+    padding: 1rem 0 2rem 0;
     background-color: var(--primary);
     color: var(--white);
 }
@@ -58,7 +58,7 @@ section {
     border-bottom: 2px solid var(--secondary);
     font-weight: normal;
     color: var(--dark);
-    margin-bottom: 1.75rem;
+    margin-bottom: 1.25rem;
 }
 
 /* Cards/Data */

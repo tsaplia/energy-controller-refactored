@@ -24,7 +24,7 @@
 
 * [PlatformIO](https://platformio.org/) extension for VS Code (or CLI)
 * ESP8266-based board (e.g., NodeMCU v3)
-* [PZEM-014/016](/docs/PZEM-014,016%20specification.pdf) sensor
+* PZEM-014/016 sensor
 
 ### Flashing / OTA
 
@@ -107,11 +107,11 @@ You can access most functionality using HTTP routes or WebSockets. Useful for au
 
 | Route              | Method | Description                                                              |
 | ------------------ | ------ | ------------------------------------------------------------------------ |
-| `/api/restart`     | POST   | Restart the controller                                                   |
-| `/api/pause`       | POST   | Pause all logic (data/log saving, time sync) but keep interfaces running |
-| `/api/resume`      | POST   | Resume functionality after pause                                         |
+| `/api/restart`     | GET   | Restart the controller                                                   |
+| `/api/pause`       | GET   | Pause all logic (data/log saving, time sync) but keep interfaces running |
+| `/api/resume`      | GET   | Resume functionality after pause                                         |
 | `/api/system-info` | GET    | Get info about chip, memory, filesystem, etc.                            |
-| `/api/clear-old`   | POST   | Delete old data from CSV based on retention setting                      |
+| `/api/clear-old`   | GET   | Delete old data from CSV based on retention setting                      |
 
 </details>
 

@@ -65,14 +65,6 @@ SensorData getSensorData() {
     const int regNum = 9;
     uint16_t dataArr[regNum];
 
-    // TODO: remove
-    for(int i = 0; i < regNum; ++i) {
-        dataArr[i] = i+1;
-    }
-
-    return SensorData(dataArr);
-    // TODO: remove end
-
     delay(100);
     Serial.flush();
     Serial.swap();  // switch to sensor
