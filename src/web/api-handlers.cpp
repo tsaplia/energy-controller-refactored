@@ -63,11 +63,12 @@ void handleSettingsSet() {
     if(doc["logLevel"].is<int>() && !logger.logStorage.setLogLevel(doc["logLevel"])) {
         return sendMessage(400, "Invalid log level");
     };
+
+    configs.fromJson(doc, true);
     if(doc["timezoneOffset"].is<int>()) {
         syncTime();
     };
 
-    configs.fromJson(doc, true);
     configs.lastSaveDay += configs.dayPhaseStart - configs.timezoneOffset - _dayPhaseOffset;
     configs.lastSaveNight += configs.nightPhaseStart - configs.timezoneOffset - _nightPhaseOffset;
 
